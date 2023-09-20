@@ -1,0 +1,8 @@
+﻿N°,Opérateur,"Nom du Site
+exploité par l'Opérateur",Code Site,"Technologie
+ 2G et/ou 3G et/ou 4G et BTS/Node B/e-Node B /BSC-RNC",Techno,"Type du Site
+(Green Field ou Rooftop)","Source d'énergie du Site
+(JIRAMA, Solaire, Groupe électrogène, Eolienne, Mixte,…)",Propriétaire du site,"Site mutualisé
+(OUI/NON)",Si Mutualisé Opérateur en colocation,Latitude,Longitude,Hauteur de l’antenne par rapport au sol (m),"Largeur des canaux occupés
+(MHz)",CodeCommune,Année de mise en service
+1,op1,site ,s1,2G/3G/4G,2G-3G-4G,GreenField,JIRAMA,OMA,OUI,Telma,10.1,14.54,20,,110124,2022
