@@ -9,7 +9,8 @@ use App\Models\Source_energie;
 use App\Models\Technologie;
 use App\Models\Type_site;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use App\Models\Logs;
+use App\Models\Type_action;
 use Illuminate\Support\Facades\DB;
 
 class File_Contr extends Controller
@@ -245,6 +246,12 @@ class File_Contr extends Controller
                             
                         }
                     }
+                $action=new Logs();
+                $action->id_utilisateur=auth()->user()->id;
+                $idtypeaction=Type_action::where('action','=','insertion')->pluck('id')->first();
+                $action->id_type_action=$idtypeaction;
+                $action->detail='Import fichier csv '.$request->file('fichier_csv');
+                $action->newLogs();
                     DB::commit();
                     fclose($handle); // Close the file after reading
                 }

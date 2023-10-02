@@ -30,7 +30,9 @@
                     </div>
                     <div class="col-md-6">
                         <div class="btn-group pull-right">
-                            <input type="search" class="form-control" id="searchInput" placeholder="Rechercher..."> 
+                            <form method="get" action="{{route('user.search')}}">
+                            <input type="search" class="form-control" id="searchInput" name="search" placeholder="Rechercher..."> 
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -49,8 +51,16 @@
                     </tr>
                 </thead>
                 <tbody>
+                <script>
+                        function info(id) {
+
+                            var url = "{{ route('utilisateur.info', ['idUpdate' => 'blanc']) }}";
+                            url = url.replace('blanc', id);
+                            window.location.href = url;
+                        }
+                    </script>
                     @foreach($liste as $Utilisateur)
-                    <tr class="odd gradeX">
+                    <tr class="odd gradeX" onclick="info(@json($Utilisateur->id))">
                         <td scope="row"> {{$loop->index+1}} </td>
                         <td> {{$Utilisateur->matricule}} </td>
                         <td> {{$Utilisateur->nom}} </td>

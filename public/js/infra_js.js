@@ -59,13 +59,13 @@
                     nom_s.textContent=data['nom_site'];
                     oper.textContent=data['operateur'];
                     prop.textContent=data['proprietaire'];
-                    annee.textContent=data['annee_mise_service'];
+                    annee.textContent=data['annee'];
                     com.textContent=data['commune'];
                     lon.textContent=data['longitude'];
                     lat.textContent=data['latitude'];
                     type.textContent=data['type_site'];
                     mutualise.textContent=data['mutualise'];
-                    coloc.textContent=data['colloc'];
+                    coloc.textContent=data['coloc'];
                     hauteur.textContent=data['hauteur'];
                     largeur.textContent=data['largeur_canaux'];
                     info.textContent=data['technologie_generation'];

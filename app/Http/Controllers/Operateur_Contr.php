@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Operateur;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Logs;
+use App\Models\Type_action;
 
 class Operateur_Contr extends Controller
 {
@@ -13,6 +15,12 @@ class Operateur_Contr extends Controller
         if (auth()->check()) {
             $utilisateur = auth()->user();
             $liste = Operateur::where('operateur', '!=', 'Non defini')->paginate(7);
+            $action = new Logs();
+            $action->id_utilisateur = auth()->user()->id;
+            $idtypeaction = Type_action::where('action', '=', 'liste')->pluck('id')->first();
+            $action->id_type_action = $idtypeaction;
+            $action->detail = 'Liste operateurs ';
+            $action->newLogs();
             return view('Admin/liste_operateur', compact('utilisateur', 'liste'));
         } else {
             return redirect()->route('login');
@@ -53,6 +61,14 @@ class Operateur_Contr extends Controller
                     'operateur' => $op->operateur,
                     'couleur' => $op->couleur
                 ]);
+
+                $action=new Logs();
+                $action->id_utilisateur=auth()->user()->id;
+                $idtypeaction=Type_action::where('action','=','insertion')->pluck('id')->first();
+                $action->id_type_action=$idtypeaction;
+                $action->detail='Ajout operateur :'.$request->input('operateur');
+                $action->newLogs();
+
                 // Redirigez l'utilisateur avec un message de succès
                 return redirect()->back()->with('success', 'Opérateur crée avec succès.');
             }
@@ -93,6 +109,12 @@ class Operateur_Contr extends Controller
 
                 $op->logo=$fileName;
                 $op->save();
+                $action=new Logs();
+                $action->id_utilisateur=auth()->user()->id;
+                $idtypeaction=Type_action::where('action','=','modification')->pluck('id')->first();
+                $action->id_type_action=$idtypeaction;
+                $action->detail='Modification operateur :'.$request->input('operateur');
+                $action->newLogs();
                 // Redirigez l'utilisateur avec un message de succès
                 return redirect()->back()->with('success', 'opérateur modifier avec succès.');
             }

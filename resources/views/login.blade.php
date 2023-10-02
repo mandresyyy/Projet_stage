@@ -53,7 +53,7 @@ License: You must have a valid license purchased only from themeforest(the above
         <!-- BEGIN LOGO -->
         <div class="logo">
             <a href="index.html">
-                <img src="{{asset('login/logo_artec.png')}}" alt="" /> </a>
+                <img src="{{asset('login/logo_artec_complet.png')}}" style="width: 200px;" alt="" /> </a>
         </div>
         <!-- END LOGO -->
         <!-- BEGIN LOGIN -->
@@ -74,13 +74,13 @@ License: You must have a valid license purchased only from themeforest(the above
                 <div class="form-group">
                     <!--ie8, ie9 does not support html5 placeholder, so we just show field title for that-->
                     <label class="control-label visible-ie8 visible-ie9">Email</label>
-                    <input class="form-control form-control-solid placeholder-no-fix" type="text" autocomplete="off" placeholder="Username" name="email" /> </div>
+                    <input class="form-control form-control-solid placeholder-no-fix" type="text" autocomplete="off" placeholder="Mail" name="email" /> </div>
                 <div class="form-group">
                     <label class="control-label visible-ie8 visible-ie9">Mot de passe</label>
-                    <input class="form-control form-control-solid placeholder-no-fix" type="password" autocomplete="off" placeholder="Password" name="motdepasse" /> </div>
+                    <input class="form-control form-control-solid placeholder-no-fix" type="password" autocomplete="off" placeholder="Mot de passe" name="motdepasse" /> </div>
                 <div class="form-actions">
                     <button type="submit" class="btn green uppercase">Se connecter</button>
-                    <a href="javascript:;" id="forget-password" class="forget-password">Forgot Password?</a>
+                    <a href="javascript:;" id="forget-password" class="forget-password">Mot de passe oublié ?</a>
                 </div>
                 
                
@@ -88,17 +88,17 @@ License: You must have a valid license purchased only from themeforest(the above
             <!-- END LOGIN FORM -->
             <!-- BEGIN FORGOT PASSWORD FORM -->
             <form class="forget-form" action="index.html" method="post">
-                <h3 class="font-green">Forget Password ?</h3>
-                <p> Enter your e-mail address below to reset your password. </p>
+                <h3 class="font-green">Recuperation de mot de passe</h3>
+                <p> Veullez entrer votre mail. </p>
                 <div class="form-group">
                     <input class="form-control placeholder-no-fix" type="text" autocomplete="off" placeholder="Email" name="email" /> </div>
                 <div class="form-actions">
-                    <button type="button" id="back-btn" class="btn green btn-outline">Back</button>
-                    <button type="submit" class="btn btn-success uppercase pull-right">Submit</button>
+                    <button type="button" id="back-btn" class="btn green btn-outline">retour</button>
+                    <button type="submit" class="btn btn-success uppercase pull-right">Envoyer</button>
                 </div>
                 <div class="#">
                     <p>
-                        <a href="javascript:;" id="register-btn" class="uppercase">Recuperer mot de passe</a>
+                        <a href="javascript:;" id="register-btn" class="uppercase">Valider</a>
                     </p>
                 </div>
             </form>
@@ -120,7 +120,6 @@ License: You must have a valid license purchased only from themeforest(the above
                     <input class="form-control placeholder-no-fix" type="password" autocomplete="off" placeholder="Re-type Your Password" name="rpassword" /> </div>
                
                 <div class="form-actions">
-                    <button type="button" id="register-back-btn" class="btn green btn-outline">Back</button>
                     <button type="submit" id="register-submit-btn" class="btn btn-success uppercase pull-right">Submit</button>
                 </div>
             </form>

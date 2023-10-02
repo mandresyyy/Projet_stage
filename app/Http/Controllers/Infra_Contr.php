@@ -13,6 +13,8 @@ use App\Models\Infra_source;
 use App\Models\Infra_technologie;
 use App\Models\Proprietaire_site;
 use Illuminate\Support\Facades\DB;
+use App\Models\Logs;
+use App\Models\Type_action;
 use Exception;
 
 class Infra_Contr extends Controller
@@ -20,8 +22,15 @@ class Infra_Contr extends Controller
     public function liste()
     {
         if (auth()->check()) {
+
             $utilisateur = auth()->user();
             $liste = Infra::paginate(15);
+            $action=new Logs();
+            $action->id_utilisateur=$utilisateur->id;
+            $idtypeaction=Type_action::where('action','=','liste')->pluck('id')->first();
+            $action->id_type_action=$idtypeaction;
+            $action->detail='Liste des Infrastructures';
+            $action->newLogs();
             return view('Admin/liste_infra', compact('utilisateur', 'liste'));
         } else {
             return redirect()->route('login');
@@ -38,6 +47,12 @@ class Infra_Contr extends Controller
             $listesrc=Source_energie::where('source','!=','Non defini')->get();
             $listetech=Technologie::all();
             $listeop1=Operateur::all();
+            $action=new Logs();
+        $action->id_utilisateur=auth()->user()->id;
+        $idtypeaction=Type_action::where('action','=','Recherche')->pluck('id')->first();
+        $action->id_type_action=$idtypeaction;
+        $action->detail='Info infrastructure :'.$infra->code_site.' '.$infra->nom_site;
+        $action->newLogs();
             return view('Admin/info_infra', compact('utilisateur','listetech','listesrc','infra','listeop','listetype','listeinfrasrc','listeinfratech','listeop1'));
         } else {
             return redirect()->route('login');
@@ -83,6 +98,7 @@ class Infra_Contr extends Controller
     }
     public function display(Request $request){
         $infr=new Infra();
+        
         $infr->code_site=$request->input('code_site');
         $infr->nom_site=$request->input('nom_site');
 
@@ -92,7 +108,6 @@ class Infra_Contr extends Controller
         if($request->input('proprio')!=''){
            
             $proprio->proprietaire=$request->input('proprio');
-            $infr->id_proprietaire=$proprio->getId();    
         }
         else{
             $proprio->proprietaire="Non defini";
@@ -100,6 +115,10 @@ class Infra_Contr extends Controller
        
         if($request->input('commune')!=''){
             $commune=Commune::where('commune','=',$request->input('commune'))->first();
+            if($commune==null){
+                $commune = new Commune();
+                $commune->commune ='Non defini';
+            }
             $infr->id_commune=$commune->id;
         }
         else{
@@ -147,24 +166,21 @@ class Infra_Contr extends Controller
                 $techno=$techno.' '.$tech->generation;
             }
         }
-        // foreach($listetech as $l){
+       
 
-        // }
-
-        $infr->technologie_generation=$request->input('info');
+        if($request->input('info')!=''){
+            $infr->technologie_generation=$request->input('info');
+        }
 
         $listesource=[];
         $source='';
         if($request->input('source')!=''){
-        $sourc=$request->input('source');
-           
+        $listesource=explode('-', $request->input('source'));
             
-            foreach($sourc as $s){
-                $src=new Source_energie();
-                $src=Source_energie::find($s);
-                $listesource[]=$src;
-                $source=$source.' '.$src->source;
+            foreach($listesource as $s){
+                $source=$source.' '.$s;
             }
+            // dd($source);
     
         }
 
@@ -193,10 +209,12 @@ class Infra_Contr extends Controller
         
         // Convertissez le tableau en JSON
         $json = json_encode($data);
+        // dd($json);
         
         session(['infra'=>$infr]);
         session(['techno'=>$listetech]);
         session(['source'=>$listesource]);
+        session(['proprio'=>$proprio]);
         
 
         return ($json);
@@ -213,21 +231,41 @@ class Infra_Contr extends Controller
             'tech' => 'required',
         ]);
         $infra=session('infra');
-        // dd($infra);
+            if($infra->id_commune==null){
+                return back()->withErrors(['Erreur_commune'=>'Commune non existant.'])->withInput();
+
+            }
         $listesrc=session('source');
         $listetech=session('techno');
+        $proprio=session('proprio');
+
         DB::beginTransaction();
+        $infra->id_proprietaire=$proprio->getId();    
+
+        // dd($listetech);
         $infra->save();
+
         $id=$infra->id;
+
+      
         // insert infra source
-        foreach ($listesrc as $source) {
-            DB::table('infra_source')->insert(
-                [
-                    'id_infra' => $id,
-                    'id_source' => $source->id
-                ]
-            );
-        }
+        foreach($listesrc as $s){
+                $src=Source_energie::where('source','=',$s)->first();
+                if($src==null){
+                    $src=new Source_energie();
+                    $id = DB::table('source_energie')->insertGetId(
+                        ['source' => $s],
+                    );
+                    $src->id=$id;
+                    $src->source=$s;
+                }
+                DB::table('infra_source')->insert(
+                    [
+                        'id_infra' => $id,
+                        'id_source' => $src->id
+                    ]
+                );
+            }
 
         // insert infra tech
         foreach ($listetech as $gen) {
@@ -238,10 +276,17 @@ class Infra_Contr extends Controller
                 ]
             );
         }
+        $action=new Logs();
+        $action->id_utilisateur=auth()->user()->id;
+        $idtypeaction=Type_action::where('action','=','insertion')->pluck('id')->first();
+        $action->id_type_action=$idtypeaction;
+        $action->detail='Ajout infrastructure'.$infra->nom_site.'('.$infra->code_site.')';
+        $action->newLogs();
         DB::commit();
         session()->forget('infra');
         session()->forget('source');
         session()->forget('techno');
+        session()->forget('proprio');
         return back()->with('success','Infrastructure ajoutée avec succès');
     }
 
@@ -270,7 +315,7 @@ class Infra_Contr extends Controller
 
         
         if($request->input('source')!=''){
-        $sourc=$request->input('source');
+        $sourc=explode('-', $request->input('source'));
         }
         else{
             $sourc=[];
@@ -296,10 +341,13 @@ class Infra_Contr extends Controller
             Infra_source::where('id_infra',$infr->id)->delete();
             $infr->save();
             foreach ($sourc as $source) {
+                $energie=new Source_energie();
+                $energie->source=$source;
+                $idsource=$energie->getOrcreateID();
                 DB::table('infra_source')->insert(
                     [
                         'id_infra' => $infr->id,
-                        'id_source' => $source
+                        'id_source' => $idsource
                     ]
                 );
             }
@@ -308,13 +356,26 @@ class Infra_Contr extends Controller
         }
         catch(Exception $e){
             DB::rollBack();
+            dd($e);
             return back()->withErrors(['Erreur'=>'La modification a échouée.']);
         }
+        $action=new Logs();
+        $action->id_utilisateur=auth()->user()->id;
+        $idtypeaction=Type_action::where('action','=','modification')->pluck('id')->first();
+        $action->id_type_action=$idtypeaction;
+        $action->detail='Modification infrastructure'.$infr->nom_site.'('.$infr->code_site.')';
+        $action->newLogs();
         DB::commit();
         return redirect()->back()->with('success', 'Modification éffectuée');
     }
 
     public function update_technique(Request $request){
+        $request->validate([
+            'id_infra' => 'required',
+            'latitude' => 'required',
+            'longitude' => 'required',
+        ]);
+
         $infr=Infra::find($request->input('id_infra'));
 
         $infr->latitude=$request->input('latitude');
@@ -348,6 +409,12 @@ class Infra_Contr extends Controller
             DB::rollBack();
             return back()->withErrors(['Erreur'=>'La modification a échouée.']);
         }
+        $action=new Logs();
+        $action->id_utilisateur=auth()->user()->id;
+        $idtypeaction=Type_action::where('action','=','modification')->pluck('id')->first();
+        $action->id_type_action=$idtypeaction;
+        $action->detail='Modification information technique '.$infr->nom_site.'('.$infr->code_site.')';
+        $action->newLogs();
         DB::commit();
         return redirect()->back()->with('success', 'Modification éffectuée');
     }
@@ -361,18 +428,29 @@ class Infra_Contr extends Controller
             $infra->en_service=true;
         }
         $infra->save();
+        $action=new Logs();
+        $action->id_utilisateur=auth()->user()->id;
+        $idtypeaction=Type_action::where('action','=','modification')->pluck('id')->first();
+        $action->id_type_action=$idtypeaction;
+        $action->detail='Modification etat infrastructure '.$infra->nom_site.'('.$infra->code_site.')';
+        $action->newLogs();
         return back();
     }
 
     public function search(Request $request){
         session(['search_infra'=>$request->input('search')]);
-       
+        $action=new Logs();
+        $action->id_utilisateur=auth()->user()->id;
+        $idtypeaction=Type_action::where('action','=','Recherche')->pluck('id')->first();
+        $action->id_type_action=$idtypeaction;
+        $action->detail='Recherche infrastructure :'.$request->input('search');
+        $action->newLogs();
         if (auth()->check()) {
             
 
                 $utilisateur = auth()->user();
                 $list=DB::table('v_all_infra_info')
-                        ->whereRaw("concat(nom_site,' ',operateur,' ',type,' ',proprietaire,' ',commune,' ',region) 
+                        ->whereRaw("concat(nom_site,' ',operateur,' ',type,' ',proprietaire,' ',commune,' ',region,' ',etat) 
                         like ?",['%'.session('search_infra').'%'])
                         ->pluck('id');
             

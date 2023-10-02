@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Technologie;
 use Illuminate\Http\Request;
+use App\Models\Logs;
+use App\Models\Type_action;
 
 class Techno_Contr extends Controller
 {
@@ -11,6 +13,12 @@ class Techno_Contr extends Controller
     if(auth()->check()){
         $utilisateur=auth()->user();
         $liste=Technologie::paginate(7);
+            $action = new Logs();
+            $action->id_utilisateur = auth()->user()->id;
+            $idtypeaction = Type_action::where('action', '=', 'liste')->pluck('id')->first();
+            $action->id_type_action = $idtypeaction;
+            $action->detail = 'Liste technologies ';
+            $action->newLogs();
         return view ('Admin/liste_tech',compact('utilisateur','liste'));
     }
     else{
@@ -41,6 +49,12 @@ class Techno_Contr extends Controller
             Technologie::create([
                 'generation' => $tech->generation,
             ]);
+            $action = new Logs();
+            $action->id_utilisateur = auth()->user()->id;
+            $idtypeaction = Type_action::where('action', '=', 'insertion')->pluck('id')->first();
+            $action->id_type_action = $idtypeaction;
+            $action->detail = 'Ajout technologies :' .$request->input('techno');
+            $action->newLogs();
             return redirect()->back()->with('success', 'Technologie ajoutée avec succès.');
         }
         else{
@@ -77,6 +91,12 @@ class Techno_Contr extends Controller
         $bool=$tech->check2();
         if($bool){
            $tech->save();
+           $action = new Logs();
+           $action->id_utilisateur = auth()->user()->id;
+           $idtypeaction = Type_action::where('action', '=', 'modification')->pluck('id')->first();
+           $action->id_type_action = $idtypeaction;
+           $action->detail = 'Modification technologie :' .$request->input('techno');
+           $action->newLogs();
             return redirect()->back()->with('success', 'Technologie modifiée avec succès.');
         }
         else{

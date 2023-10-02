@@ -26,7 +26,7 @@
                     <div class="tab-content">
                         <!-- PERSONAL INFO TAB -->
                         <div class="tab-pane active" id="tab_1_1">
-                            <form role="form" action="{{route('admin.profil.update')}}" method="POST">
+                            <form role="form" action="{{route('user.profil.update')}}" method="POST">
                                 @csrf
                             <div class="form-group">
                                     <label class="control-label">Matricule</label>
@@ -84,7 +84,7 @@
 
                         <!-- CHANGE PASSWORD TAB -->
                         <div class="tab-pane" id="tab_1_3">
-                            <form action="{{route('admin.mdp.update')}}" method="POST">
+                            <form action="{{route('user.mdp.update')}}" method="POST">
                                 @csrf
                                 <div class="form-group">
                                     <label class="control-label">Current Password</label>

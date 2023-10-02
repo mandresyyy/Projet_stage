@@ -8,7 +8,10 @@ use Illuminate\Http\Request;
 use App\Models\Utilisateur;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Logs;
+use App\Models\Type_action;
 
 class UtilisateurContr extends Controller
 {
@@ -21,13 +24,18 @@ class UtilisateurContr extends Controller
             if($check instanceof Utilisateur){
                 
                 auth()->login($check);
+                $action=new Logs();
+                $action->id_utilisateur=$check->id;
+                $idtypeaction=Type_action::where('action','=','connexion')->pluck('id')->first();
+                $action->id_type_action=$idtypeaction;
+                $action->detail='Connexion reussi';
+                $action->newLogs();
 
                 if ($check->id_type_util==1){
                     return redirect()->route('admin.acceuil');
                 }
                 else{
-                    dd("ato");
-                    auth()->logout();
+                   return redirect()->route('user.acceuil');
                 }
                
                
@@ -52,6 +60,12 @@ class UtilisateurContr extends Controller
                 $boolean=$utilisateur->SInscrire();
 
                 if($boolean){
+                    $action = new Logs();
+                    $action->id_utilisateur = auth()->user()->id;
+                    $idtypeaction = Type_action::where('action', '=', 'insertion')->pluck('id')->first();
+                    $action->id_type_action = $idtypeaction;
+                    $action->detail = 'Creation utilisateur :'.' '. $utilisateur->prenom.' '.$utilisateur->email.' '.$utilisateur->matricule;
+                    $action->newLogs();
                     return back()->with(['success' => 'Utilisateur crée']);
                 }
                 else{
@@ -74,6 +88,12 @@ class UtilisateurContr extends Controller
         if(auth()->check()){
             $utilisateur=auth()->user();
             $liste=Utilisateur::paginate(7);
+            $action = new Logs();
+                    $action->id_utilisateur = auth()->user()->id;
+                    $idtypeaction = Type_action::where('action', '=', 'liste')->pluck('id')->first();
+                    $action->id_type_action = $idtypeaction;
+                    $action->detail = 'Liste utilisateur';
+                    $action->newLogs();
             return view ('Admin/liste_user',compact('utilisateur','liste'));
         }
         else{
@@ -109,6 +129,12 @@ class UtilisateurContr extends Controller
             $util->id_etat_compte=$request->input('etat');
             $bool=$util->modifier();
             if($bool){
+                $action = new Logs();
+                $action->id_utilisateur = auth()->user()->id;
+                $idtypeaction = Type_action::where('action', '=', 'modification')->pluck('id')->first();
+                $action->id_type_action = $idtypeaction;
+                $action->detail = 'Modification utilisateur : '.$util->email.' '.$util->matricule;
+                $action->newLogs();
                 return back()->with(['success' => 'Modification effectuée']);
             }
             else{
@@ -138,6 +164,12 @@ class UtilisateurContr extends Controller
             $util->id_etat_compte=$utilisateur->id_etat_compte;
             $bool=$util->modifier();
             if($bool){
+                $action = new Logs();
+                $action->id_utilisateur = auth()->user()->id;
+                $idtypeaction = Type_action::where('action', '=', 'modification')->pluck('id')->first();
+                $action->id_type_action = $idtypeaction;
+                $action->detail = 'Modification profil : '.$util->email.' '.$util->matricule;
+                $action->newLogs();
                 return back()->with(['success' => 'Modification effectuée']);
             }
             else{
@@ -169,6 +201,12 @@ class UtilisateurContr extends Controller
                     $util->motdepasse=$request->input('confirmation');
                     $bool=$util->modifier();
                     if($bool){
+                        $action = new Logs();
+                        $action->id_utilisateur = auth()->user()->id;
+                        $idtypeaction = Type_action::where('action', '=', 'modification')->pluck('id')->first();
+                        $action->id_type_action = $idtypeaction;
+                        $action->detail = 'Modification mot de passe : '.$util->email.' '.$util->matricule;
+                        $action->newLogs();
                         return back()->with(['success' => 'Mot de passe changé avec succés']);
                     }
                     else{
@@ -186,6 +224,36 @@ class UtilisateurContr extends Controller
         else{
             return redirect()->route('login');
         }
+    }
+
+    public function search(Request $request){
+        // session(['search_utilisateur'=>$request->input('search')]);
+       
+        if (auth()->check()) {
+            
+
+                $utilisateur = auth()->user();
+                $list=DB::table('v_all_info_utilisateur')
+                        ->whereRaw("concat(email,' ',matricule,' ',nom,' ',prenom,' ',etat) 
+                        like ?",['%'.$request->input('search').'%'])
+                        ->pluck('id');
+            
+                    $liste=Utilisateur::whereIn('id',$list)->paginate(20);
+                    $action = new Logs();
+                        $action->id_utilisateur = auth()->user()->id;
+                        $idtypeaction = Type_action::where('action', '=', 'Recherche')->pluck('id')->first();
+                        $action->id_type_action = $idtypeaction;
+                        $action->detail = 'Recherche utilisateur :'.$request->input('search');
+                        $action->newLogs();
+                    return view ('Admin/liste_user',compact('utilisateur','liste'));
+            
+           
+        }
+        else {
+            return redirect()->route('login');
+        }
+        
+       
     }
 
 }

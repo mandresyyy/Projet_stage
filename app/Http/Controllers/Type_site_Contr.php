@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Type_site;
 use Illuminate\Http\Request;
+use App\Models\Logs;
+use App\Models\Type_action;
 
 class Type_site_Contr extends Controller
 {
@@ -23,6 +25,12 @@ class Type_site_Contr extends Controller
         if (auth()->check()) {
             $utilisateur = auth()->user();
             $liste = Type_site::where('type', '!=', 'Non defini')->paginate(7);
+            $action = new Logs();
+            $action->id_utilisateur = auth()->user()->id;
+            $idtypeaction = Type_action::where('action', '=', 'liste')->pluck('id')->first();
+            $action->id_type_action = $idtypeaction;
+            $action->detail = 'Liste type de site';
+            $action->newLogs();
             return view('Admin/liste_type_site', compact('utilisateur', 'liste'));
         } else {
             return redirect()->route('login');
@@ -42,6 +50,12 @@ class Type_site_Contr extends Controller
                 Type_site::create([
                     'type' => $type->type,
                 ]);
+                $action = new Logs();
+                $action->id_utilisateur = auth()->user()->id;
+                $idtypeaction = Type_action::where('action', '=', 'insertion')->pluck('id')->first();
+                $action->id_type_action = $idtypeaction;
+                $action->detail = 'Ajout nouveau type de site '.$type->type;
+                $action->newLogs();
                 return redirect()->back()->with('success', 'Type de site ajoutée avec succès.');
             }
             else{
@@ -79,6 +93,12 @@ class Type_site_Contr extends Controller
             $bool=$type->check2();
             if($bool){
                $type->save();
+               $action = new Logs();
+               $action->id_utilisateur = auth()->user()->id;
+               $idtypeaction = Type_action::where('action', '=', 'modification')->pluck('id')->first();
+               $action->id_type_action = $idtypeaction;
+               $action->detail = 'Modification type de site '.$type->type;
+               $action->newLogs();
                 return redirect()->back()->with('success', 'Type de site ajoutée avec succès.');
             }
             else{

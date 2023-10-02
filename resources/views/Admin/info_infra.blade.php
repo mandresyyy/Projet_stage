@@ -137,15 +137,22 @@
                     <div class="col-md-6">
                         <br>
                         <label class="control-label">Source energie</label>
-                        <select class="form-control" name="source[]" multiple>
-                            @foreach($listesrc as $src)
-                            @if($src->not_in($listeinfrasrc)==false)
-                            <option selected value="{{$src->id}}">{{$src->source}}</option>
-                            @else
-                            <option value="{{$src->id}}">{{$src->source}}</option>
-                            @endif
-                            @endforeach
-                        </select>
+                        
+                        <?php $listesrc='';
+                            $i=0;
+                        ?>
+                        @foreach($listeinfrasrc as $src)
+                           <?php 
+                                if($i==0){
+                                    $listesrc=$listesrc.$src->source->source;
+                                }
+                                else{
+                                    $listesrc=$listesrc.'-'.$src->source->source;
+                                }
+                                $i++;
+                           ?>
+                        @endforeach
+                        <input class="form-control" type="text" name="source" value="{{$listesrc}}">
                     </div>
                     <div class="form-group">
                         <div class="col-md-6">
@@ -179,7 +186,7 @@
                     <div class="col-md-12" style="margin-top: 20px;">
 
                         <a id="valider1" class="btn green"> Valider</a>
-                        <a id="back" class="btn default"> Annuler </a>
+                        <a href="{{route('infra.liste')}}" class="btn default"> Retour </a>
                     </div>
 
 
@@ -242,7 +249,7 @@
                     <div class="col-md-12" style="margin-top: 20px;">
 
                         <a href="javascript:;" id="valider2" class="btn green"> Valider</a>
-                        <a id="back" class="btn default"> Annuler </a>
+                        <a href="{{route('infra.liste')}}" class="btn default"> Retour </a>
                     </div>
                 </form>
             </div>

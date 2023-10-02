@@ -117,6 +117,15 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+        
+        'connexion'=>[
+            'driver'=> 'daily',
+            'path' => storage_path('logs/login.log'),
+            'level' =>'info',
+            'days' =>7,
+            'max_files'=>30,
+            'permisssions'=>0664,
+        ]
     ],
 
 ];

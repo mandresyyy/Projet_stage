@@ -80,10 +80,10 @@
                                         <label class="control-label col-md-3">Operateur
                                         <span class="required"> * </span></label>
                                         <div class="col-md-4">
-                                            <select name="operateur" id="country_list" class="form-control" value="{{ old('operateur') }}">
+                                            <select name="operateur" id="country_list" class="form-control" ">
                                                 @foreach($listeop as $op)
                                                     @if($op->operateur!='Non defini')
-                                                        <option value="{{$op->id}}">{{$op->operateur}}</option>
+                                                        <option value="{{$op->id}}" {{ old('operateur') == $op->id ? 'selected' : '' }}>{{$op->operateur}}</option>
                                                     @endif
                                                 @endforeach
                                             </select>
@@ -128,7 +128,7 @@
                                             <span class="required"> * </span>
                                         </label>
                                         <div class="col-md-4">
-                                            <input type="text" class="form-control" name="code_c" id="code_commune" disabled/>
+                                            <input type="text" class="form-control" name="code_c" id="code_commune" value="{{old('code_c')}}" disabled/>
 
                                         </div>
                                     </div>
@@ -137,7 +137,7 @@
                                             <span class="required"> * </span>
                                         </label>
                                         <div class="col-md-4">
-                                            <input type="text" class="form-control" name="longitude" required/>
+                                            <input type="text" class="form-control" name="longitude" value="{{old('longitude')}}" required/>
 
                                         </div>
                                     </div>
@@ -146,7 +146,7 @@
                                             <span class="required"> * </span>
                                         </label>
                                         <div class="col-md-4">
-                                            <input type="text" class="form-control" name="latitude" required/>
+                                            <input type="text" class="form-control" name="latitude" value="{{old('latitude')}}" required/>
 
                                         </div>
                                     </div>
@@ -154,11 +154,11 @@
                                     <div class="form-group">
                                         <label class="control-label col-md-3">Type de site</label>
                                         <div class="col-md-4">
-                                            <select name="type" id="country_list" class="form-control">
+                                            <select name="type" id="country_list" class="form-control" value="{{old('type')}}">
                                                     <option value="1">Non defini</option>
                                                 @foreach($listetype as $type)
                                                         @if($type->type!='Non defini')
-                                                        <option value="{{$type->id}}">{{$type->type}}</option>
+                                                        <option value="{{$type->id}}" {{ old('type') == $type->id ? 'selected' : '' }}>{{$type->type}}</option>
                                                         @endif
                                                 @endforeach
 
@@ -172,9 +172,9 @@
                                         <div class="col-md-4">
                                             <div class="radio-list">
                                                 <label>
-                                                    <input type="radio" name="mutualise" value="0" checked /> Non </label>
+                                                    <input type="radio" name="mutualise" value="0" {{ old('mutualise') == '0' ? 'checked' : '' }} checked /> Non </label>
                                                 <label>
-                                                    <input type="radio" name="mutualise" value="1" /> Oui </label>
+                                                    <input type="radio" name="mutualise" value="1" {{ old('mutualise') == '1' ? 'checked' : '' }} /> Oui </label>
                                             </div>
                                             <div id="form_gender_error"> </div>
                                         </div>
@@ -182,9 +182,9 @@
                                     <div class="form-group">
                                         <label class="control-label col-md-3">Operateur en colocation</label>
                                         <div class="col-md-4">
-                                            <select name="coloc" id="country_list" class="form-control">
+                                            <select name="coloc" id="country_list" class="form-control" >
                                             @foreach($listeop as $op)
-                                                        <option value="{{$op->id}}">{{$op->operateur}}</option>
+                                                        <option value="{{$op->id}}" {{ old('coloc') == $op->id ? 'selected' : '' }}>{{$op->operateur}}</option>
                                                    
                                                 @endforeach
 
@@ -204,9 +204,9 @@
                                             <span class="required"> * </span>
                                         </label>
                                         <div class="col-md-4">
-                                            <select multiple name="tech[]"  class="form-control"  required>
+                                            <select multiple name="tech[]"  class="form-control"   required>
                                                 @foreach($listetech as $tech)
-                                                    <option value="{{$tech->id}}">{{$tech->generation}}</option>
+                                                    <option value="{{$tech->id}}" {{ old('tech') == $tech->id ? 'selected' : '' }}>{{$tech->generation}}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -217,20 +217,16 @@
                                             <span class="required">  </span>
                                         </label>
                                         <div class="col-md-4">
-                                            <textarea class="form-control" name="info" rows="3"></textarea>
+                                            <textarea class="form-control" name="info" rows="3" value="{{old('info')}}"></textarea>
                                             <span class="help-block"> </span>
                                         </div>
                                     </div>
-                                    <div class="form-group form-md-line-input">
+                                    <div class="form-group">
                                         <label class="control-label col-md-3">Source d'énergie
                                             <span class="required">  </span>
                                         </label>
                                         <div class="col-md-4">
-                                            <select class="form-control" name="source[]" multiple="">
-                                                @foreach($listesource as $source)
-                                                    <option value="{{$source->id}}">{{$source->source}}</option>
-                                                @endforeach
-                                            </select>
+                                        <input type="text" name="source" class="form-control" value="{{old('source')}}" placeholder="source1-source2"/>
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -238,7 +234,7 @@
                                             <span class="required">  </span>
                                         </label>
                                         <div class="col-md-4">
-                                            <input type="text" name="hauteur" maxlength="4" class="form-control" />
+                                            <input type="text" name="hauteur" maxlength="4" class="form-control" value="{{old('hauteur')}}"/>
 
                                         </div>
                                     </div>
@@ -247,7 +243,7 @@
                                             <span class="required"> </span>
                                         </label>
                                         <div class="col-md-4">
-                                            <input type="text" name="largeur" maxlength="4" class="form-control" />
+                                            <input type="text" name="largeur" maxlength="4" class="form-control" value="{{old('largeur')}}"/>
 
                                         </div>
                                     </div>

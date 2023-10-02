@@ -62,8 +62,10 @@ create table recuperation (
 );
 
 create table logs(
+    id int PRIMARY KEY AUTO_INCREMENT,
     id_utilisateur int not null references utilisateur(id),
     id_type_action int not null references type_action(id),
+    detail text not null,
     date  datetime not null default now()
 );
 
@@ -138,9 +140,13 @@ alter table utilisateur add column id_etat_compte int default 1 references etat_
 
 alter table infra add column en_service boolean default true; 
 
--- recherche avance 
+-- recherche avance infra
 create or replace view v_all_infra_info as 
-select infra.id,infra.nom_site,infra.en_service,operateur.operateur,type_site.type,proprietaire_site.proprietaire,commune.commune,commune.region
+select infra.id,infra.nom_site,infra.en_service,operateur.operateur,type_site.type,proprietaire_site.proprietaire,
+commune.commune,commune.region,CASE
+        WHEN infra.en_service = true THEN 'en service'
+        ELSE 'hors service'
+    END AS etat
  from infra join operateur on infra.id_operateur=operateur.id
  join type_site on infra.id_type_site=type_site.id join proprietaire_site on infra.id_proprietaire =proprietaire_site.id 
  join commune on infra.id_commune=commune.id;
@@ -164,3 +170,9 @@ create or replace view filtre_infra as
 SELECT i.*,i_t.id_technologie,i_src.id_source,com.code_r
 FROM infra_technologie i_t
 JOIN infra i ON i_t.id_infra = i.id join infra_source i_src on i.id=i_src.id_infra join commune com on i.id_commune= com.id
+
+-- view all info utilisateur recherche avance 
+create or replace view v_all_info_utilisateur as
+select utilisateur.* ,etat_compte.etat from utilisateur join etat_compte on utilisateur.id_etat_compte=etat_compte.id;
+
+insert into type_action (action) values ('Connexion'),('Recherche'),('statistique'),('modification'),('insertion'),('liste');

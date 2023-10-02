@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Source_energie extends Model
 {
@@ -21,5 +22,19 @@ class Source_energie extends Model
             }
         }
         return $check;
+    }
+
+    public function getOrcreateID(){
+        $src=Source_energie::where('source','=',$this->source)->first();
+        
+        if($src==null){
+            $id = DB::table('source_energie')->insertGetId(
+                ['source' => $this->source],
+            );
+        }
+        else{
+            $id=$src->id;
+        }
+        return $id;
     }
 }

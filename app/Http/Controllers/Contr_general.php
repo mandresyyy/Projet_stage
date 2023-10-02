@@ -9,8 +9,12 @@ use Illuminate\Http\Request;
 use App\Models\Technologie;
 use App\Models\Type_site;
 use App\Models\Type_util;
-use App\Models\Utilisateur;
 use Illuminate\Support\Facades\DB;
+use App\Models\Logs;
+use App\Models\Type_action;
+use App\Models\Releve;
+use GeoJSON\GeoJSON;
+use GeoJSON\Feature\FeatureCollection;
 
 class Contr_general extends Controller
 {
@@ -32,6 +36,22 @@ class Contr_general extends Controller
             return redirect()->route('login');
         }
     }
+    public function to_acceuil_user(){
+        if(auth()->check()){
+            $utilisateur=auth()->user();
+            $operateur=Operateur::where('operateur','!=','Non defini')->get();
+            $technologie=Technologie::all();
+            $type=Type_site::where('type','!=','Non defini')->get();
+            $source=Source_energie::all();
+            $region=DB::table('v_Liste_Region')->get();
+            $liste=collect();
+            return view ('Utilisateur/map_liste',compact('liste','utilisateur','operateur','technologie','type','source','region'));
+        }
+        else{
+            return redirect()->route('login');
+        }
+
+    }
     public function create_user(){
         if(auth()->check()){
             $utilisateur=auth()->user();
@@ -47,6 +67,16 @@ class Contr_general extends Controller
         if(auth()->check()){
             $utilisateur=auth()->user();
             return view ('Admin/Profile',compact('utilisateur'));
+        }
+        else{
+            return redirect()->route('login');
+        }
+
+    }
+    public function user_profile(){
+        if(auth()->check()){
+            $utilisateur=auth()->user();
+            return view ('Utilisateur/Profile',compact('utilisateur'));
         }
         else{
             return redirect()->route('login');
@@ -89,8 +119,44 @@ class Contr_general extends Controller
         $tab=[];
         $tab[]=$resultat;
         $tab[]=$user->id;
+        $action = new Logs();
+        $action->id_utilisateur = auth()->user()->id;
+        $idtypeaction = Type_action::where('action', '=', 'Recherche')->pluck('id')->first();
+        $action->id_type_action = $idtypeaction;
+        $action->detail = 'Recherche sur la carte ';
+        $action->newLogs();
         return $tab;
     }
+  
+//     public function test(){
+//         // $geojsonFilePath = public_path('geojson/region.geojson');
+//         // $file = fopen($geojsonFilePath, 'r');
+//         // $nb=1;
+//         // while (($line = fgets($file)) !== false) {
+//         //     if($nb==6){
+//         //         dd($line);
+//         //     }
+//         //     $nb++;
+//         // }
+//         $pythonScriptPath = public_path('test.py');
+// $command = "python $pythonScriptPath";
+// $output = shell_exec($command);
+// dd($output);
+// // Traitez la sortie du script Python (supposons que le script renvoie un tableau associatif JSON)
+// $pythonOutput = json_decode($output, true);
+// dd($pythonOutput);
+// // Utilisez les données dans Laravel
+// if (!empty($pythonOutput)) {
+//     // Faites quelque chose avec les données, par exemple, les afficher
+//     dd($pythonOutput);
+// } else {
+//     // Le script Python n'a pas renvoyé de données valides
+//     echo "Le script Python n'a pas renvoyé de données valides.";
+// }
+//     }
+
+
+
 
 
     
