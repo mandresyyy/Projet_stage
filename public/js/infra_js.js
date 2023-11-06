@@ -89,7 +89,7 @@
             showTab(currentTab - 1);
         });
         var mutualiseRadio = document.querySelectorAll("input[name='mutualise']");
-        var colocSelect = document.querySelector("select[name='coloc']");
+        var colocSelect = document.querySelector("input[name='coloc']");
 
         // Fonction pour mettre à jour le champ "Colocataire"
         function updateColocField() {
@@ -97,7 +97,7 @@
 
             if (mutualiseValue === "0") {
                 // console.log("ato");
-                colocSelect.value = "1";
+                colocSelect.value = "";
                 colocSelect.disabled = true;
                 
             } else {

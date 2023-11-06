@@ -9,6 +9,7 @@ use App\Models\Source_energie;
 use App\Models\Technologie;
 use App\Models\Type_site;
 use App\Models\Commune;
+use App\Models\Infra_collocation;
 use App\Models\Infra_source;
 use App\Models\Infra_technologie;
 use App\Models\Proprietaire_site;
@@ -22,16 +23,21 @@ class Infra_Contr extends Controller
     public function liste()
     {
         if (auth()->check()) {
-
+            // $tempsDebut = microtime(true);
             $utilisateur = auth()->user();
-            $liste = Infra::paginate(15);
+            $liste = Infra::select('id','id_operateur','nom_site','id_type_site','id_proprietaire','id_commune','en_service','date_upload')
+            ->with('technologies','operateur','type_site','proprietaire','commune')->get();
+            // dd($liste);
             $action=new Logs();
             $action->id_utilisateur=$utilisateur->id;
             $idtypeaction=Type_action::where('action','=','liste')->pluck('id')->first();
             $action->id_type_action=$idtypeaction;
             $action->detail='Liste des Infrastructures';
             $action->newLogs();
-            return view('Admin/liste_infra', compact('utilisateur', 'liste'));
+            $page='infra';
+            // $tempsFin = microtime(true);
+            // dd($tempsFin - $tempsDebut);
+            return view('Admin/liste_infra', compact('page','utilisateur', 'liste'));
         } else {
             return redirect()->route('login');
         }
@@ -47,13 +53,16 @@ class Infra_Contr extends Controller
             $listesrc=Source_energie::where('source','!=','Non defini')->get();
             $listetech=Technologie::all();
             $listeop1=Operateur::all();
+           
+            // dd($listecoloc);
             $action=new Logs();
         $action->id_utilisateur=auth()->user()->id;
         $idtypeaction=Type_action::where('action','=','Recherche')->pluck('id')->first();
         $action->id_type_action=$idtypeaction;
         $action->detail='Info infrastructure :'.$infra->code_site.' '.$infra->nom_site;
         $action->newLogs();
-            return view('Admin/info_infra', compact('utilisateur','listetech','listesrc','infra','listeop','listetype','listeinfrasrc','listeinfratech','listeop1'));
+        $page='infra';
+            return view('Admin/info_infra', compact('page','utilisateur','listetech','listesrc','infra','listeop','listetype','listeinfrasrc','listeinfratech','listeop1'));
         } else {
             return redirect()->route('login');
         }
@@ -85,7 +94,8 @@ class Infra_Contr extends Controller
            $listetype=Type_site::all();
            $listesource=Source_energie::all();
            $listetech=Technologie::all();
-            return view('Admin/new_infra', compact('utilisateur','listeop','listetype','listesource','listetech'));
+           $page='infra';
+            return view('Admin/new_infra', compact('page','utilisateur','listeop','listetype','listesource','listetech'));
         } else {
             return redirect()->route('login');
         }
@@ -130,8 +140,8 @@ class Infra_Contr extends Controller
         $infr->annee_mise_service=$request->input('annee');
        
 
-        $infr->latitude=$request->input('latitude');
-        $infr->longitude=$request->input('longitude');
+        $infr->latitude=str_replace(',','.',$request->input('latitude'));
+        $infr->longitude=str_replace(',','.',$request->input('longitude'));
 
         $type=Type_site::find($request->input('type'));
         $infr->id_type_site=$type->id;
@@ -144,15 +154,12 @@ class Infra_Contr extends Controller
                 $mut='OUI';
             }
         $infr->mutualise= $mut;
-
-        if($request->input('coloc')==''){
-            $id=1;
-        }
-        else{
-            $id=$request->input('coloc');
-        }
-        $coloc=Operateur::find($id);
-        $infr->id_colloc= $coloc->id;
+       
+        $colocataire=$request->input('coloc');
+        $infr->coloc= $colocataire;
+      
+        
+       
 
         $listetech=[];
         $techno='';
@@ -199,7 +206,7 @@ class Infra_Contr extends Controller
             "latitude" => $infr->latitude,
             "type_site" => $type->type,
             "mutualise" => $infr->mutualise,
-            "coloc" => $coloc->operateur,
+            "coloc" =>  $colocataire,
             "source"=> $source,
             "techno"=>$techno,
             "info_techno"=>$infr->technologie_generation,
@@ -215,7 +222,6 @@ class Infra_Contr extends Controller
         session(['techno'=>$listetech]);
         session(['source'=>$listesource]);
         session(['proprio'=>$proprio]);
-        
 
         return ($json);
 
@@ -238,7 +244,6 @@ class Infra_Contr extends Controller
         $listesrc=session('source');
         $listetech=session('techno');
         $proprio=session('proprio');
-
         DB::beginTransaction();
         $infra->id_proprietaire=$proprio->getId();    
 
@@ -246,7 +251,11 @@ class Infra_Contr extends Controller
         $infra->save();
 
         $id=$infra->id;
+        if($infra->mutualise=='NON' && $infra->coloc!=''){
+            DB::rollBack();
+            return back()->withErrors(['Erreur'=>'Presence de colocataire dans une infrastructure non mutualise.'])->withInput();
 
+        }
       
         // insert infra source
         foreach($listesrc as $s){
@@ -276,17 +285,36 @@ class Infra_Contr extends Controller
                 ]
             );
         }
+
+      
         $action=new Logs();
         $action->id_utilisateur=auth()->user()->id;
         $idtypeaction=Type_action::where('action','=','insertion')->pluck('id')->first();
         $action->id_type_action=$idtypeaction;
         $action->detail='Ajout infrastructure'.$infra->nom_site.'('.$infra->code_site.')';
         $action->newLogs();
+        DB::table('mise_a_jour')->where("domaine",'=','infra')->update([
+            "domaine"=>'infra',
+            "etat"=>'1'
+        ]);
+        DB::table('mise_a_jour')->where("domaine",'=','infra_releve')->update([
+            "domaine"=>'infra_releve',
+            "etat"=>'1'
+        ]);
+        DB::table('mise_a_jour')->where("domaine",'=','infra_source')->update([
+            "domaine"=>'infra_source',
+            "etat"=>'1'
+        ]);
+        DB::table('mise_a_jour')->where("domaine",'=','infra_tech')->update([
+            "domaine"=>'infra_tech',
+            "etat"=>'1'
+        ]);
         DB::commit();
         session()->forget('infra');
         session()->forget('source');
         session()->forget('techno');
         session()->forget('proprio');
+        session()->forget('coloc');
         return back()->with('success','Infrastructure ajoutée avec succès');
     }
 
@@ -328,13 +356,12 @@ class Infra_Contr extends Controller
                 $mut='OUI';
             }
         $infr->mutualise= $mut;
-
-        if($request->input('coloc')==''){
-            $infr->id_colloc=1;
+        if($request->input('mutualise')==0 && $request->input('coloc')!=''){
+            return back()->withErrors(['Erreur'=>'Presence de colocataire dans une infrastructure non mutualise.']);
         }
-        else{
-            $infr->id_colloc=$request->input('coloc');
-        }
+        $infr->coloc=$request->input('coloc');
+        
+       
 
         DB::beginTransaction();
         try{
@@ -351,6 +378,7 @@ class Infra_Contr extends Controller
                     ]
                 );
             }
+           
 
 
         }
@@ -365,6 +393,22 @@ class Infra_Contr extends Controller
         $action->id_type_action=$idtypeaction;
         $action->detail='Modification infrastructure'.$infr->nom_site.'('.$infr->code_site.')';
         $action->newLogs();
+        DB::table('mise_a_jour')->where("domaine",'=','infra')->update([
+            "domaine"=>'infra',
+            "etat"=>'1'
+        ]);
+        DB::table('mise_a_jour')->where("domaine",'=','infra_releve')->update([
+            "domaine"=>'infra_releve',
+            "etat"=>'1'
+        ]);
+        DB::table('mise_a_jour')->where("domaine",'=','infra_source')->update([
+            "domaine"=>'infra_source',
+            "etat"=>'1'
+        ]);
+        DB::table('mise_a_jour')->where("domaine",'=','infra_tech')->update([
+            "domaine"=>'infra_tech',
+            "etat"=>'1'
+        ]);
         DB::commit();
         return redirect()->back()->with('success', 'Modification éffectuée');
     }
@@ -415,6 +459,22 @@ class Infra_Contr extends Controller
         $action->id_type_action=$idtypeaction;
         $action->detail='Modification information technique '.$infr->nom_site.'('.$infr->code_site.')';
         $action->newLogs();
+        DB::table('mise_a_jour')->where("domaine",'=','infra')->update([
+            "domaine"=>'infra',
+            "etat"=>'1'
+        ]);
+        DB::table('mise_a_jour')->where("domaine",'=','infra_releve')->update([
+            "domaine"=>'infra_releve',
+            "etat"=>'1'
+        ]);
+        DB::table('mise_a_jour')->where("domaine",'=','infra_source')->update([
+            "domaine"=>'infra_source',
+            "etat"=>'1'
+        ]);
+        DB::table('mise_a_jour')->where("domaine",'=','infra_tech')->update([
+            "domaine"=>'infra_tech',
+            "etat"=>'1'
+        ]);
         DB::commit();
         return redirect()->back()->with('success', 'Modification éffectuée');
     }
@@ -434,6 +494,14 @@ class Infra_Contr extends Controller
         $action->id_type_action=$idtypeaction;
         $action->detail='Modification etat infrastructure '.$infra->nom_site.'('.$infra->code_site.')';
         $action->newLogs();
+        DB::table('mise_a_jour')->where("domaine",'=','infra')->update([
+            "domaine"=>'infra',
+            "etat"=>'1'
+        ]);
+        DB::table('mise_a_jour')->where("domaine",'=','infra_releve')->update([
+            "domaine"=>'infra_releve',
+            "etat"=>'1'
+        ]);
         return back();
     }
 
@@ -447,7 +515,7 @@ class Infra_Contr extends Controller
         $action->newLogs();
         if (auth()->check()) {
             
-
+            $page='infra';
                 $utilisateur = auth()->user();
                 $list=DB::table('v_all_infra_info')
                         ->whereRaw("concat(nom_site,' ',operateur,' ',type,' ',proprietaire,' ',commune,' ',region,' ',etat) 
@@ -455,7 +523,7 @@ class Infra_Contr extends Controller
                         ->pluck('id');
             
                     $liste=Infra::whereIn('id',$list)->paginate(20);
-                return view('Admin/liste_infra', compact('utilisateur', 'liste'));
+                return view('Admin/liste_infra', compact('page','utilisateur', 'liste'));
             
            
         }
@@ -468,13 +536,24 @@ class Infra_Contr extends Controller
     public function formupload(){
         if (auth()->check()) {
             $utilisateur = auth()->user();
-           
-            return view('Admin/Upload', compact('utilisateur'));      
+            $page='infra';
+            $operateur=Operateur::where('operateur','!=','Non defini')->get();
+            return view('Admin/Upload', compact('page','utilisateur','operateur'));      
     }
     else {
         return redirect()->route('login');
     }
     
+    }
+
+    public function delete($id){
+        if (auth()->check()) {
+            Infra::destroy($id);
+            return back()->with('delete','Infra supprimer');      
+    }
+    else {
+        return redirect()->route('login');
+    }
     }
 }
 

@@ -1,0 +1,23 @@
+tr{
+    text-align: center;
+}
+th{
+    background-color: #e6EEEE;
+    border: 1px solid #CDCDCD;
+    
+}
+.pvtRowLabel{
+    text-align: left;
+}
+table{
+    width: 100%;
+    border-collapse: collapse;
+    margin-left: auto;
+}
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}

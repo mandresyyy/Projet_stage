@@ -94,7 +94,8 @@ class UtilisateurContr extends Controller
                     $action->id_type_action = $idtypeaction;
                     $action->detail = 'Liste utilisateur';
                     $action->newLogs();
-            return view ('Admin/liste_user',compact('utilisateur','liste'));
+                    $page='util';
+            return view ('Admin/liste_user',compact('page','utilisateur','liste'));
         }
         else{
             return redirect()->route('login');
@@ -109,7 +110,8 @@ class UtilisateurContr extends Controller
             $util=Utilisateur::find($idUpdate);
             $type_user=Type_util::all();
             $etat=Etat_compte::all();
-            return view ('Admin/update_user',compact('utilisateur','util','type_user','etat'));
+            $page='util';
+            return view ('Admin/update_user',compact('page','utilisateur','util','type_user','etat'));
         }
         else{
             return redirect()->route('login');
@@ -245,7 +247,8 @@ class UtilisateurContr extends Controller
                         $action->id_type_action = $idtypeaction;
                         $action->detail = 'Recherche utilisateur :'.$request->input('search');
                         $action->newLogs();
-                    return view ('Admin/liste_user',compact('utilisateur','liste'));
+                        $page='util';
+                    return view ('Admin/liste_user',compact('page','utilisateur','liste'));
             
            
         }

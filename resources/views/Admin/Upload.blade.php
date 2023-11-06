@@ -1,4 +1,13 @@
 @extends("Admin.Layouts.master")
+@section('nav')
+<li>
+    <a href="{{route('infra.liste')}}">Infrastructure</a>
+    <i class="fa fa-angle-right"></i>
+</li>
+<li>
+    <span>Importation de données</span>
+</li>
+@endsection
 @section('contenu')
 <link href="{{asset('login/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.css')}}" rel="stylesheet" type="text/css" />
 
@@ -34,6 +43,26 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="form-group">
+                        <label class="control-label col-md-3">Operateur :</label>
+                        <div class="col-md-3">
+                            <select class="form-control uneditable-input input-fixed input-medium" name="operateur">
+                                @foreach($operateur as $op)
+                                    <option value='{{$op->id}}'>{{$op->operateur}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Type d'action : </label>
+                            <div class="col-md-3">
+                                <div >
+                                    <div class="input-group input-large">
+                                        <input name="action" type="checkbox" class="make-switch" checked data-on-text="Ajout" data-on-color="success" data-off-color="warning" data-off-text="Mise à jour" data-size="small">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
 
 
@@ -63,9 +92,9 @@
         </div>
 
         @endif
-        @if(session('success'))
+        @if(session('upload'))
         <div class="alert alert-success">
-            {{ session('success') }}
+            {{ session('upload') }}
         </div>
         @endif
         </div>

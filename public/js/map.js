@@ -1,4 +1,3 @@
-window.onload = function () {
 var map = L.map('map').setView([-18.8792, 46.3504], 6); // initialisation de la carte
 var tuile = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { // ajout tuile
     maxZoom: 25,
@@ -6,6 +5,7 @@ var tuile = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { // a
 }).addTo(map);
 var group = L.layerGroup();
 var group_d = L.layerGroup();
+
 
 
 // var layerControl = L.control.layers().addTo(map);
@@ -26,7 +26,6 @@ function onEachFeature(feature, layer) {
         var contenu = contenu + '<tr><td><strong>Proprietaire :</td><td>' + feature.properties.proprietaire + '</td></tr>';
         var contenu = contenu + '<tr><td><strong>Site mutualisé :</td><td>' + feature.properties.mutualise + ' </td></tr>';
         var contenu = contenu + '<tr><td><strong>Operateur en colocation:</td><td>' + feature.properties.colloc + ' </td></tr>';
-        var contenu = contenu + '<tr><td><strong>Site mutualisé :</td><td>' + feature.properties.mutualise + ' </td></tr>';
         var contenu = contenu + '<tr><td><strong>Latitude :</td><td>' + feature.properties.latitude + ' </td></tr>';
         var contenu = contenu + '<tr><td><strong>Longitude :</td><td>' + feature.properties.longitude + ' </td></tr>';
         var contenu = contenu + '<tr><td><strong>Hauteur antenne  (m):</td><td>' + feature.properties.hauteur_antenne + ' </td></tr>';
@@ -46,29 +45,34 @@ function onEachFeature(feature, layer) {
 
 }
 
+
+
+
 function showMarqueur(json_name) {
     // console.log(json_name);
-    var marks = "/geojson/" + json_name + ".geojson";
-    if (window['marquage'] != null) {
-        map.removeLayer(window['marquage']);
-    }
+  
+
+    // var marks = "/geojson/testa.geojson";
+    
     if (window['marks'] != null) {
         // console.log("misy");
         window['marks'].clearLayers();
         map.removeLayer(window['marks']);
     }
 
+   
+    // fetch(marks)
+    //     .then(response => response.json())
+    //     .then(data => {
 
-    fetch(marks)
-        .then(response => response.json())
-        .then(data => {
-
-            group.addLayer(L.geoJSON(data, {
+    group.addLayer(L.geoJSON(json_name, {
                 pointToLayer: function (feature, latlng) {
-                    let lon = parseFloat(feature.properties.longitude);
-                    let lat = parseFloat(feature.properties.latitude);
+                    let lon = parseFloat(latlng.lng);
+                    let lat = parseFloat(latlng.lat);
                     let demi = 0.005;
-
+                    if (isNaN(lon) || isNaN(lat)) {
+                        console.log(feature);
+                    }
                     let supgauche = [lat + demi, lon - demi];
                     let supdroite = [lat - demi, lon + demi];
                     var carre = L.rectangle([supgauche, supdroite], {
@@ -77,27 +81,105 @@ function showMarqueur(json_name) {
                         fillOpacity: 0.5
                     });
                     if (feature.properties.mutualise == 'OUI') {
-                        var circle = L.circle([feature.properties.latitude, feature.properties.longitude], {
+                        var circle = L.circle([lat, lon], {
                             color: 'purple',
                             fillColor: '##BA55D3',
                             fillOpacity: 0.5,
-                            radius: 50
+                            radius: 25
                         });
                         group.addLayer(circle);
                     }
-
-                    return carre
+                   return carre
+                    
                 },
 
                 onEachFeature: onEachFeature,
 
             }));
-
-        })
-        .catch(error => console.error('Erreur :', error));
+        // })
+        // .catch(error => console.error('Erreur :', error));
     group.addTo(map);
     window['marks'] = group;
 }
+
+function showCouche(json_name) {
+    var marks = "/geojson/"+json_name+".topojson"; 
+    var legende='';
+    var LayerGroup = L.featureGroup();
+
+    if(json_name=='region'){
+        legende='<span style="background-color: transparent; width: 15px; height: 15px; display: inline-block; margin-right: 5px; border: 3px solid green;"></span>Region';
+
+        var option = {
+            color: 'green', 
+            fillOpacity:0,
+            weight: 2
+        };
+    
+        fetch(marks)
+            .then(response => response.json())
+            .then(topojsonData => {
+                const geojson = topojson.feature(topojsonData, topojsonData.objects.collection);
+    
+                LayerGroup.addLayer(L.geoJSON(geojson,{
+                    style:option,
+                    onEachFeature:function(feature,layer){
+                        // console.log(feature.properties.NOMREGION);
+                        var contenu = '<table>';
+                        var contenu = contenu + '<tr><td><strong>Code region :</td> <td>' + feature.properties.CODEREG + '</td></tr>';
+                        var contenu = contenu + '<tr><td><strong>Region :</td><td> ' + feature.properties.NOMREGION + '</td></tr></table>';
+                        layer.bindPopup(contenu);
+                        var customLabelIcon = L.divIcon({
+                            className: 'custom-label-icon', 
+                            iconSize: [70, 40], 
+                            html: '<div class="custom-label" style="color:green">' + feature.properties.NOMREGION + '</div>', 
+                        });
+                        LayerGroup.addLayer(L.marker(layer.getBounds().getCenter(), { icon: customLabelIcon }));
+                    }
+                }))
+            })
+            .catch(error => console.error('Erreur :', error));
+    
+            layerControl.addOverlay(LayerGroup,legende);
+    }
+
+    else{
+        legende='<span style="background-color: transparent; width: 15px; height: 15px; display: inline-block; margin-right: 5px; border: 3px solid blue;"></span>District';
+
+        var option = {
+            color: 'blue', 
+            fillOpacity:0,
+            weight:1
+        };
+    
+        fetch(marks)
+            .then(response => response.json())
+            .then(topojsonData => {
+                const geojson = topojson.feature(topojsonData, topojsonData.objects.collection);
+    
+                LayerGroup.addLayer(L.geoJSON(geojson,{
+                    style:option,
+                    onEachFeature:function(feature,layer){
+                        var contenu = '<table>';
+                        var contenu = contenu + '<tr><td><strong>Code district :</td> <td>' + feature.properties.CODEDIST + '</td></tr>';
+                        var contenu = contenu + '<tr><td><strong>District :</td><td> ' + feature.properties.NOMDIST + '</td></tr></table>';
+                        layer.bindPopup(contenu);
+                        var customLabelIcon = L.divIcon({
+                            className: 'custom-label-icon', 
+                            iconSize: [70, 40], 
+                            html: '<div class="custom-label" style="color:blue">' + feature.properties.NOMDIST + '</div>', 
+                        });
+                        LayerGroup.addLayer(L.marker(layer.getBounds().getCenter(), { icon: customLabelIcon }));
+                    }
+                }))
+            })
+            .catch(error => console.error('Erreur :', error));
+    
+            layerControl.addOverlay(LayerGroup,legende);
+    }
+    
+}
+
 
 var operateur = [];
 var region = [];
@@ -156,6 +238,7 @@ mutualise.addEventListener('change', function () {
     search();
 })
 
+
 function search() {
     $.ajax({
         type: 'GET',
@@ -170,60 +253,22 @@ function search() {
         },
         success: function (data) {
             // console.log(data);
-            console.log(data[0]);
-            showMarqueur(data[1]); //
-            //    console.log("length" + data[0].length);
-            var t_body = document.getElementById('table_body');
-            t_body.innerHTML = '';
+            // console.log(JSON.parse(data[1]));
+            showMarqueur(JSON.parse(data[1])); //
             data[0].forEach(function (d) {
-                var newRow = document.createElement('tr');
-
-                // Créez des cellules <td> pour la nouvelle ligne (ajoutez autant que nécessaire)
-                var cell1 = document.createElement('td');
-                cell1.textContent = d.infra.nom_site;
-                var cell2 = document.createElement('td');
-                cell2.textContent = d.infra.operateur.operateur;
-                // var cell3 = document.createElement('td');
-                // cell3.textContent = d.infra.latitude;
-                // var cell4 = document.createElement('td');
-                // cell4.textContent = d.infra.longitude;
-                var cell5 = document.createElement('td');
-                cell5.textContent = d.infra.commune.commune;
-                var cell6 = document.createElement('td');
-                cell6.textContent = d.infra.commune.district;
-                var cell7 = document.createElement('td');
-                cell7.textContent = d.infra.commune.region;
-                newRow.appendChild(cell2);
-                // newRow.appendChild(cell3);
-                // newRow.appendChild(cell4);
-                newRow.appendChild(cell1);
-
-
-                newRow.appendChild(cell5);
-                newRow.appendChild(cell6);
-                newRow.appendChild(cell7);
-
-                newRow.addEventListener('click', function () {
-                    // Récupérez la latitude et la longitude à partir de la ligne cliquée
-                    let latitude = d.infra.latitude;
-                    let longitude = d.infra.longitude;
-                    if (window['marquage'] != null) {
-
-
-                        map.removeLayer(window['marquage']);
-                    }
-                    // Faites quelque chose avec les valeurs de latitude et de longitude
-                    // alert('Latitude : ' + latitude + ', Longitude : ' + longitude);
-                    window['marquage'] = L.marker([latitude, longitude]);
-                    window['marquage'].addTo(map);
-                    map.flyTo([latitude, longitude], 7, { duration: 1.5 });
-
-                    let close = document.getElementById('close');
-                    close.click();
-                });
-
-                t_body.appendChild(newRow);
+                var rowData = [
+                    d.infra.nom_site,
+                    d.infra.operateur.operateur,
+                    d.infra.commune.commune,
+                    d.infra.commune.district,
+                    d.infra.commune.region,
+                    d.infra.latitude,
+                    d.infra.longitude,
+                ];
+            
+                dataTable.row.add(rowData).draw();
             });
+            
 
         },
         error: function (error) {
@@ -231,71 +276,59 @@ function search() {
 
         }
     });
-}
 
-function show_couche(nom_couche) {
-    var nom_fichier = '/geojson/' + nom_couche + '.json';
-    var LayerGroup = L.featureGroup();
-    var legende='';
-    if (nom_couche == 'Rgion') {
-        var option = {
-            color: 'green', 
-            fillOpacity:0,
-            weight: 3
-        };
-        legende='<span style="background-color: transparent; width: 15px; height: 15px; display: inline-block; margin-right: 5px; border: 3px solid green;"></span>Region';
-        var couche = L.geoJSON(json_Rgion_1,{
-            style:option,
-            onEachFeature:function(feature,layer){
-                // console.log(feature.properties.NOMREGION);
-                var contenu = '<table>';
-                var contenu = contenu + '<tr><td><strong>Code region :</td> <td>' + feature.properties.CODEREG + '</td></tr>';
-                var contenu = contenu + '<tr><td><strong>Region :</td><td> ' + feature.properties.NOMREGION + '</td></tr></table>';
-                
-                layer.bindPopup(contenu);
-                var customLabelIcon = L.divIcon({
-                    className: 'custom-label-icon', 
-                    iconSize: [70, 40], 
-                    html: '<div class="custom-label" style="color:green">' + feature.properties.NOMREGION + '</div>', 
-                });
-                LayerGroup.addLayer(L.marker(layer.getBounds().getCenter(), { icon: customLabelIcon }));
-            }
-        });
+    dataTable.on('click', 'tr', function () {
+        var data = dataTable.row(this).data();
+    
+        // Récupérez la latitude et la longitude à partir des données de la ligne
+        var latitude = data[5]; // Remplacez 5 par l'index de la colonne contenant la latitude
+        var longitude = data[6]; // Remplacez 6 par l'index de la colonne contenant la longitude
+    
+        if (window['marquage'] != null) {
+                    map.removeLayer(window['marquage']);
+        }
         
-    }
-    else {
-        var option = {
-            fillOpacity:0,
-            color:'blue',
-            weight: 1
-        };
-        legende='<span style="background-color: transparent; width: 15px; height: 15px; display: inline-block; margin-right: 5px; border: 3px solid blue;"></span>District';
-        var couche = L.geoJSON(json_District_2,{
-            style:option,
-            onEachFeature:function(feature,layer){
-                // console.log(feature.properties.NOMDIST);
-                var contenu =  '<table>';
-                var contenu = contenu + '<tr><td><strong>Code region :</td> <td>' + feature.properties.CODEDIST + '</td></tr>';
-                var contenu = contenu + '<tr><td><strong>District :</td><td> ' + feature.properties.NOMDIST + '</td></tr></table>';
-                layer.bindPopup(contenu);
-                var customLabelIcon = L.divIcon({
-                    className: 'custom-label-icon', 
-                    iconSize: [70, 40], 
-                    html: '<div class="custom-label" style="color:blue">' + feature.properties.NOMDIST + '</div>', 
-                });
-                LayerGroup.addLayer(L.marker(layer.getBounds().getCenter(), { icon: customLabelIcon }));
-            }
-        });
-    }
-    LayerGroup.addLayer(couche);
-    layerControl.addOverlay(LayerGroup,legende);
-
-   
+                // Faites quelque chose avec les valeurs de latitude et de longitude
+                window['marquage'] = L.marker([latitude, longitude]);
+                window['marquage'].addTo(map);
+                map.flyTo([latitude, longitude], 12, { duration: 1.5 });
+        
+                let close = document.getElementById('close');
+                close.click();
+        
+        // Utilisez les valeurs de latitude et de longitude comme nécessaire
+        // console.log('Latitude : ' + latitude + ', Longitude : ' + longitude);
+    });
 }
 
-    var c1 = 'Rgion';
-    var c2 = 'District_2';
-    show_couche(c2);
-    show_couche(c1);   
+
+
+function loadGeoJSONData(url) {
+  return new Promise((resolve, reject) => {
+    fetch(url)
+      .then(response => {
+        if (!response.ok) {
+          reject(new Error(`Erreur de chargement du fichier : ${response.statusText}`));
+          return;
+        }
+        return response.json();
+      })
+      .then(data => {
+        // console.log(data);
+        resolve(data);
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
 }
 
+
+
+
+    var c1 = 'region';
+     var c2 = 'district';
+    
+    showCouche(c1);   
+    showCouche(c2);
+    

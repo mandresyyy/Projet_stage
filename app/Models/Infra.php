@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class Infra extends Model
 {
@@ -11,8 +13,8 @@ class Infra extends Model
     protected $table = 'infra';
     public $timestamps = false;
     protected $fillable = ['id','id_operateur','nom_site','code_site','technologie_generation','id_type_site',
-    'id_proprietaire','mutualise','id_colloc','latitude','longitude','hauteur',
-    'largeur_canaux','id_commune','annee_mise_service','date_upload','en_service'];
+    'id_proprietaire','mutualise','latitude','longitude','hauteur',
+    'largeur_canaux','id_commune','annee_mise_service','date_upload','en_service','coloc'];
 
     public function operateur(){
         return $this->belongsTo(Operateur::class,'id_operateur');
@@ -26,9 +28,7 @@ class Infra extends Model
         return $this->belongsTo(Proprietaire_site::class,'id_proprietaire');
     }
 
-    public function coloc(){
-        return $this->belongsTo(Operateur::class,'id_colloc');
-    }
+    
 
     public function commune(){
         return $this->belongsTo(Commune::class,'id_commune');
@@ -44,14 +44,22 @@ class Infra extends Model
         // dd($liste);
         return $liste;
     }
+    public function technologies() {
+        return $this->belongsToMany(Technologie::class, 'infra_technologie', 'id_infra', 'id_technologie');
+    }
+    public function sources() {
+        return $this->belongsToMany(Source_energie::class, 'infra_source', 'id_infra', 'id_source');
+    }
+   
 
     public function to_geoSon($op, $region, $tech, $type, $source, $mutualise, $user)
-    {
+    {   
+        // $tempsDebut = microtime(true);
         if (count($op) == 0 && count($region) == 0 && count($tech) == 0 && count($type) == 0 && count($source) == 0 && $mutualise == 'tous') {
             $resultats = collect();
         } else {
-            if ($mutualise != 'tous') {
-                $resultats = V_filtre_infra::select('id')
+                $resultats = V_filtre_infra::with(['infra','infra.type_site' ,'infra.operateur', 'infra.commune', 'infra.technologies', 'infra.proprietaire', 'infra.sources'])
+                ->select('id')
                 ->where(function ($query) use ($op) {
                     foreach ($op as $oper)
                         $query->orwhere('id_operateur', $oper);
@@ -73,102 +81,78 @@ class Infra extends Model
                         $query->orwhere('id_source', $t);
                 })
                 ->where('en_service', '=', 1)
-                ->where('mutualise', '=', $mutualise)
-                ->groupBy('id')
-                ->get();
-            } else {
-                $resultats = V_filtre_infra::select('id')
-                ->where(function ($query) use ($op) {
-                    foreach ($op as $oper)
-                        $query->orwhere('id_operateur', $oper);
-                })
-                ->where(function ($query) use ($tech) {
-                    foreach ($tech as $tec)
-                        $query->orwhere('id_technologie', $tec);
-                })
-                ->where(function ($query) use ($region) {
-                    foreach ($region as $reg)
-                        $query->orwhere('code_r', $reg);
-                })
-                ->where(function ($query) use ($type) {
-                    foreach ($type as $t)
-                        $query->orwhere('id_type_site', $t);
-                })
-                ->where(function ($query) use ($source) {
-                    foreach ($source as $t)
-                        $query->orwhere('id_source', $t);
-                })
-                ->where('en_service', '=', 1)
-                ->groupBy('id')
-                ->get();
-            }
+                ->groupBy('id');
+
+                if($mutualise!='tous'){
+                    $resultats= $resultats->where('mutualise', '=', $mutualise);
+                }
+                $resultats= $resultats->get();
+            
         }
-
-       
-
-        $filename=$user->id;
+      
         $geojson=["type"=>"FeatureCollection","features"=>[]];
 
+        $feature = [];
         foreach($resultats as $marqueur){
-            $liste_src=Infra_source::where('id_infra','=',$marqueur->id)->get();
-            $liste_source=[];
-            
-                foreach($liste_src as $ls){
-                    $liste_source[]=$ls->source->source;
-                }
-            $liste_tech=Infra_technologie::where('id_infra','=',$marqueur->id)->get();
-            $liste_techno=[];
-            
-            foreach($liste_tech as $l){
-                $liste_techno[]=$l->technologie->generation;
-            }
+           $infra=$marqueur->infra;
+           $oper=$infra->operateur;
+           $commune=$infra->commune;
+           $type_site=$infra->type_site->type;
+           $proprietaire=$infra->proprietaire->proprietaire;
+           $liste_tech=$infra->technologies->pluck('generation')->toArray();
+           $liste_src=$infra->sources->pluck('source')->toArray();
             $feature=[
                 "type"=>"Feature",
                 "geometry"=>[
                     "type"=>"Point",
-                    "coordinates"=> [$marqueur->infra->longitude,$marqueur->infra->latitude]
+                    "coordinates"=> [$infra->longitude, $infra->latitude]
                 ],
                 "properties"=>[
-                    "couleur"=>$marqueur->infra->operateur->couleur,
-                    "operateur"=>$marqueur->infra->operateur->operateur,
-                    "logo"=>$marqueur->infra->operateur->logo,
-                    "nom_site"=>$marqueur->infra->nom_site,
-                    "code_site"=>$marqueur->infra->code_site,
-                    "technologie_generation"=>$liste_techno,
-                    "techno"=>$marqueur->infra->technologie_generation,
-                    "type_du_site"=>$marqueur->infra->type_site->type,
-                    "proprietaire"=>$marqueur->infra->proprietaire->proprietaire,
-                    "mutualise"=>$marqueur->infra->mutualise,
-                    "latitude"=>$marqueur->infra->latitude,
-                    "longitude"=>$marqueur->infra->longitude,
-                    "colloc"=>$marqueur->infra->coloc->operateur,
-                    "hauteur_antenne"=>$marqueur->infra->hauteur,
-                    "largeur_canaux"=>$marqueur->infra->largeur_canaux,
-                    "commune"=>$marqueur->infra->commune->commune,
-                    "code_commune"=>$marqueur->infra->commune->code_c,
-                    "district"=>$marqueur->infra->commune->district,
-                    "code_district"=>$marqueur->infra->commune->code_d,
-                    "region"=>$marqueur->infra->commune->region,
-                    "code_region"=>$marqueur->infra->commune->code_r,
-                    "annee_mise_en_service"=>$marqueur->infra->annee_mise_service,
-                    "source_energie"=>$liste_source
+                    "couleur"=> $oper->couleur,
+                    "operateur"=>$oper->operateur,
+                    "logo"=> $oper->logo,
+                    "nom_site"=>$infra->nom_site,
+                    "code_site"=>$infra->code_site,
+                    "technologie_generation"=>$liste_tech,
+                    "techno"=>$infra->technologie_generation,
+                    "type_du_site"=>$type_site,
+                    "proprietaire"=> $proprietaire,
+                    "mutualise"=>$infra->mutualise,
+                    "latitude"=>$infra->latitude,
+                    "longitude"=> $infra->longitude,
+                    "colloc"=>  $infra->coloc,
+                    "hauteur_antenne"=>$infra->hauteur,
+                    "largeur_canaux"=>$infra->largeur_canaux,
+                    "commune"=>$commune->commune,
+                    "code_commune"=>$commune->code_c,
+                    "district"=>$commune->district,
+                    "code_district"=>$commune->code_d,
+                    "region"=>$commune->region,
+                    "code_region"=>$commune->code_r,
+                    "annee_mise_en_service"=>$infra->annee_mise_service,
+                    "source_energie"=> $liste_src
                 ]
                 ];
     
                 $geojson["features"][]=$feature;
         }
-    
+        // $tempsFin = microtime(true);
+        // dd($tempsFin - $tempsDebut);
                 $geojson=json_encode($geojson);
-                 $filename=public_path('geojson') . '/' .$filename.".geojson";
-                file_put_contents($filename,$geojson);
-    
-                return $resultats;
+
+                //  $filename=public_path('geojson') . "/testa.geojson";
+                // file_put_contents($filename,$geojson);
+              
+                $tab[0]=$resultats;
+                  $tab[1]= $geojson;
+                return $tab;
     }
 
     
     public function all_to_geoSon()
     {
-                $resultats = V_filtre_infra::select('id')
+                $resultats = V_filtre_infra::with(['infra','infra.type_site' ,'infra.operateur', 'infra.commune', 'infra.technologies', 'infra.proprietaire', 'infra.sources'])
+                ->select('id')
                 ->where('en_service', '=', 1)
                 ->groupBy('id')
                 ->get();
@@ -176,49 +160,33 @@ class Infra extends Model
         $filename='infrastructure';
         $geojson=["type"=>"FeatureCollection","features"=>[]];
 
+        $feature = [];
         foreach($resultats as $marqueur){
-            $liste_src=Infra_source::where('id_infra','=',$marqueur->id)->get();
-            $liste_source=[];
-            
-                foreach($liste_src as $ls){
-                    $liste_source[]=$ls->source->source;
-                }
-            $liste_tech=Infra_technologie::where('id_infra','=',$marqueur->id)->get();
-            $liste_techno=[];
-            
-            foreach($liste_tech as $l){
-                $liste_techno[]=$l->technologie->generation;
-            }
+           $infra=$marqueur->infra;
+           $oper=$infra->operateur;
+           $commune=$infra->commune;
+           $liste_tech=$infra->technologies->pluck('generation')->toArray();
             $feature=[
                 "type"=>"Feature",
                 "geometry"=>[
                     "type"=>"Point",
-                    "coordinates"=> [$marqueur->infra->longitude,$marqueur->infra->latitude]
+                    "coordinates"=> [$infra->longitude, $infra->latitude]
                 ],
                 "properties"=>[
-                    "couleur"=>$marqueur->infra->operateur->couleur,
-                    "operateur"=>$marqueur->infra->operateur->operateur,
-                    "logo"=>$marqueur->infra->operateur->logo,
-                    "nom_site"=>$marqueur->infra->nom_site,
-                    "code_site"=>$marqueur->infra->code_site,
-                    "technologie_generation"=>$liste_techno,
-                    "techno"=>$marqueur->infra->technologie_generation,
-                    "type_du_site"=>$marqueur->infra->type_site->type,
-                    "proprietaire"=>$marqueur->infra->proprietaire->proprietaire,
-                    "mutualise"=>$marqueur->infra->mutualise,
-                    "latitude"=>$marqueur->infra->latitude,
-                    "longitude"=>$marqueur->infra->longitude,
-                    "colloc"=>$marqueur->infra->coloc->operateur,
-                    "hauteur_antenne"=>$marqueur->infra->hauteur,
-                    "largeur_canaux"=>$marqueur->infra->largeur_canaux,
-                    "commune"=>$marqueur->infra->commune->commune,
-                    "code_commune"=>$marqueur->infra->commune->code_c,
-                    "district"=>$marqueur->infra->commune->district,
-                    "code_district"=>$marqueur->infra->commune->code_d,
-                    "region"=>$marqueur->infra->commune->region,
-                    "code_region"=>$marqueur->infra->commune->code_r,
-                    "annee_mise_en_service"=>$marqueur->infra->annee_mise_service,
-                    "source_energie"=>$liste_source
+                    "couleur"=> $oper->couleur,
+                    "operateur"=>$oper->operateur,
+                    "logo"=> $oper->logo,
+                    "nom_site"=>$infra->nom_site,
+                    "technologie_generation"=>$liste_tech,
+                    "details"=>$infra->technologie_generation,
+                    "latitude"=>$infra->latitude,
+                    "longitude"=> $infra->longitude,
+                    "hauteur_antenne"=>$infra->hauteur,
+                    "largeur_canaux"=>$infra->largeur_canaux,
+                    "commune"=>$commune->commune,
+                    "district"=>$commune->district,
+                    "region"=>$commune->region,
+                  
                 ]
                 ];
     

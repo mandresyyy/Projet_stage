@@ -1,4 +1,13 @@
 @extends("Admin.Layouts.master")
+@section('nav')
+<li>
+    <a href="{{route('infra.liste')}}">Infrastructure</a>
+    <i class="fa fa-angle-right"></i>
+</li>
+<li>
+    <span>Ajout </span>
+</li>
+@endsection
 @section('contenu')
 <script src="{{asset('js/infra_js.js')}}"></script>
 <div class="row">
@@ -7,9 +16,9 @@
         <div class="portlet light bordered" id="form_wizard_1">
             <div class="portlet-title">
                 <div class="caption">
-                    <i class=" icon-layers font-red"></i>
-                    <span class="caption-subject font-red bold uppercase"> Form Wizard -
-                        <span class="step-title"> Step 1 of 4 </span>
+    
+                    <span class="caption-subject font-red bold uppercase"> Ajout infrastructure
+                        
                     </span>
                 </div>
 
@@ -25,28 +34,28 @@
                                     <a href="#" data-toggle="tab" class="step">
                                         <span class="number"> 1 </span>
                                         <span class="desc">
-                                            <i class="fa fa-check"></i> Account Setup </span>
+                                            <i class="fa fa-check"></i> Information génerale </span>
                                     </a>
                                 </li>
                                 <li>
                                     <a href="#" data-toggle="tab" class="step">
                                         <span class="number"> 2 </span>
                                         <span class="desc">
-                                            <i class="fa fa-check"></i> Profile Setup </span>
+                                            <i class="fa fa-check"></i> Paramètre </span>
                                     </a>
                                 </li>
                                 <li>
                                     <a href="#" data-toggle="tab" class="step active">
                                         <span class="number"> 3 </span>
                                         <span class="desc">
-                                            <i class="fa fa-check"></i> Billing Setup </span>
+                                            <i class="fa fa-check"></i> Information technique </span>
                                     </a>
                                 </li>
                                 <li>
                                     <a href="#" data-toggle="tab" class="step">
                                         <span class="number"> 4 </span>
                                         <span class="desc">
-                                            <i class="fa fa-check"></i> Confirm </span>
+                                            <i class="fa fa-check"></i> Confirmation </span>
                                     </a>
                                 </li>
                             </ul>
@@ -182,13 +191,8 @@
                                     <div class="form-group">
                                         <label class="control-label col-md-3">Operateur en colocation</label>
                                         <div class="col-md-4">
-                                            <select name="coloc" id="country_list" class="form-control" >
-                                            @foreach($listeop as $op)
-                                                        <option value="{{$op->id}}" {{ old('coloc') == $op->id ? 'selected' : '' }}>{{$op->operateur}}</option>
-                                                   
-                                                @endforeach
+                                        <input class="form-control" name="coloc" value="{{old('coloc')}}" >
 
-                                            </select>
                                         </div>
                                     </div>
 

@@ -7,49 +7,17 @@ use App\Models\Releve;
 use App\Models\Operateur;
 use Illuminate\Support\Facades\File;
 use App\Models\Infra;
+use Illuminate\Support\Facades\DB;
+use App\Models\Technologie;
 
 class Contr_releve_signal extends Controller
 {
-    public function MapReleve(){
-        if(auth()->check()){
-            $utilisateur=auth()->user();
-            $releve = new Releve();
-            $data = $releve->getAllReleve();
-            // dd($data[0][0]['Timestamp']); //fichier // ligne txt // colonne
-            // dd($data['Orange']);
-            // dd($data);
-            $infra=new Infra();
-            $infra->all_to_geoSon();
-            $operateur=Operateur::where('operateur','!=','Non defini')->get();
-            return view ('Admin/map_releve',compact('utilisateur','data','operateur'));
-        }
-        else{
-            return redirect()->route('login');
-        }
-    }
-    public function MapReleveUser(){
-        if(auth()->check()){
-            $utilisateur=auth()->user();
-            $releve = new Releve();
-            $data = $releve->getAllReleve();
-            // dd($data[0][0]['Timestamp']); //fichier // ligne txt // colonne
-            // dd($data['Orange']);
-            // dd($data);
-            $infra=new Infra();
-            $infra->all_to_geoSon();
-            $operateur=Operateur::where('operateur','!=','Non defini')->get();
-            return view ('Utilisateur/map_releve',compact('utilisateur','data','operateur'));
-        }
-        else{
-            return redirect()->route('login');
-        }
-    }
-
     public function FormReleve(){
         if(auth()->check()){
             $utilisateur=auth()->user();
             $operateur=Operateur::where('operateur','!=','Non defini')->get();
-            return view ('Admin/newReleve',compact('utilisateur','operateur'));
+            $page='releve';
+            return view ('Admin/newReleve',compact('page','utilisateur','operateur'));
         }
         else{
             return redirect()->route('login');
@@ -58,21 +26,109 @@ class Contr_releve_signal extends Controller
 
     public function upload(Request $request){
         $request->validate([
-            'fichier' => 'required|mimes:txt|max:2048',
+            'fichier' => 'required|mimes:txt',
+            'description'=>'required'
         ]);
-        // $tempFilePath = $request->file('fichier')->getRealPath();
+        $file = $request->file('fichier');
+        $filePath = $file->getPathname();
+        $releve=new Releve();
+        $releve->id_operateur=$request->input('operateur');
+        $releve->description=$request->input('description');
+        $check=$releve->saveReleve($filePath);
+       
+        if($check!=null){
+            return back()->withErrors(['erreur' => $check]);
+        }
+        else{
+            DB::table('mise_a_jour')->where("domaine",'=','releve')->update([
+                "domaine"=>'releve',
+                "etat"=>'1'
+            ]);
+            return back()->with(['success'=>'Fichier importé avec succès ']);
+        }
+    }
+    public function toMapReleve(){
+       
+        if(auth()->check()){
+            $utilisateur = auth()->user();
+            if($utilisateur->type->type_util=='Admin'){ $action='Admin/map_releve';}
+            else{ $action='Utilisateur/map_releve';}
+            $checkreleve=DB::table('mise_a_jour')->select('etat')->where('domaine','releve')->first();
+            $checkinfra=DB::table('mise_a_jour')->select('etat')->where('domaine','infra_releve')->first();
+            $checkop=DB::table('mise_a_jour')->select('etat')->where('domaine','operateur_releve')->first();
+            $checktech=DB::table('mise_a_jour')->select('etat')->where('domaine','technologie_releve')->first();
+            $opinfra=$checkop->etat;
+            // dd($checkreleve->etat);
+           
+            if($checkreleve->etat==1 || $checkop->etat==1 || $checktech->etat==1){
+                $releve = new Releve();
+                $liste_op = $releve->get_All();
+                DB::table('mise_a_jour')->where("domaine",'=','releve')->update([
+                    "domaine"=>'releve',
+                    "etat"=>'0'
+                ]);
 
-        $chemin_dossier = storage_path('app/public/Releve/'.$request->input('operateur'));
-        // dd(File::exists($chemin_dossier));
+                $liste_tech=$releve->get_All_Tech();
+                DB::table('mise_a_jour')->where("domaine",'=','operateur_releve')->update([
+                    "domaine"=>'operateur_releve',
+                    "etat"=>'0'
+                ]);
+                DB::table('mise_a_jour')->where("domaine",'=','technologie_releve')->update([
+                    "domaine"=>'technologie_releve',
+                    "etat"=>'0'
+                ]);
+            }
+            else{
+                $liste_op =Operateur::where('operateur','!=','Non defini')->get();
+                $liste_tech=Technologie::where('generation','!=','Non defini')->get();
+            }
+            if( $checkinfra->etat==1 || $opinfra==1){
+                $infra=new Infra();
+                $infra->all_to_geoSon();
+                DB::table('mise_a_jour')->where("domaine",'=','infra_releve')->update([
+                    "domaine"=>'infra_releve',
+                    "etat"=>'0'
+                ]);
+            }
+            $page='releve';
+            return view ($action,compact('page','utilisateur','liste_op','liste_tech'));
+        }
+        else{
+            return redirect()->route('login');
+        }
+    }
 
-        if (!File::exists($chemin_dossier)) {
+    public function liste(){
+        if(auth()->check()){
+            $utilisateur = auth()->user();
+            if($utilisateur->type->type_util=='Admin'){ $action='Admin/liste_releve';}
+            else{ $action='Utilisateur/liste_releve';}
 
-            File::makeDirectory($chemin_dossier, 0777, true);
+            $liste=Releve::select('id_upload','date_upload','id_operateur','description')
+            ->groupBy('id_upload','date_upload','id_operateur','description')
+            ->get();
+            $page='releve';
+            return view ($action,compact('page','utilisateur','liste'));
 
         }
-        $fileName = $request->file('fichier')->getClientOriginalName();
-
-        $filePath = $request->file('fichier')->storeAs('public/Releve/'.$request->input('operateur'), $fileName);
-        return redirect()->back()->with('success', 'Fichier ajouté avec succès.');
+        else{
+            return redirect()->route('login');
+        }
     }
+
+    public function delete($id_rel){
+        if(auth()->check()){
+            Releve::where('id_upload','=',$id_rel)->delete();
+            DB::table('mise_a_jour')->where("domaine",'=','releve')->update([
+                "domaine"=>'releve',
+                "etat"=>'1'
+            ]);
+            return redirect()->route('admin.releve.liste');
+        }
+        else{
+            return redirect()->route('login');
+        }
+    }
+
+
 }

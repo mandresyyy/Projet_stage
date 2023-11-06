@@ -1,12 +1,36 @@
 @extends("Utilisateur.Layouts.master")
+@section('nav')
+<li>
+    <a href="#">Infrastructure</a>
+    <i class="fa fa-angle-right"></i>
+</li>
+<li>
+    <span>Carte</span>
+</li>
+@endsection
 @section('contenu')
-<link href="https://fonts.bunny.net/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.7.5/proj4.js"></script> -->
-<script src="{{asset('geojson/Rgion_1.js')}}"></script>
-<script src="{{asset('geojson/District_2.js')}}"></script>
 
+<link href="{{asset('css/fontMap.css')}}" rel="stylesheet">
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+<script src="https://unpkg.com/topojson-client@3"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.7.0.js"></script> -->
+<script src="{{asset('Utilitaire/jQuery.js')}}"></script>
+<script src="{{asset('Utilitaire/Data_table.min.js')}}"></script>
+
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+
+<!-- <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script> -->
+
+<!-- <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css" /> -->
+<link href="{{asset('Utilitaire/datatable.min.css')}}" rel="stylesheet" type="text/css" />
+<link href="{{asset('login/assets/global/plugins/datatables/datatables.min.css')}}" rel="stylesheet" type="text/css" />
+<link href="{{asset('login/assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css')}}" rel="stylesheet" type="text/css" />
 <style>
        .custom-label-icon {
     text-align: center;
@@ -150,10 +174,11 @@
 
 
     </div>
+    </div>
     <div class="col-md-12">
 
         <!-- BEGIN WORLD PORTLET-->
-        <div class="portlet light portlet-fit bordered" style="height: 500px;">
+        <div class="portlet light portlet-fit bordered" style="height: 100%;">
             <div class="portlet-title">
                 <div class="caption">
                     <i class=" icon-layers font-green"></i>
@@ -172,13 +197,18 @@
                 <!-- </div> -->
             </div>
             <div class="portlet-body">
-                <div id="map" class="vmaps" style="height: 400px"> </div>
+                <div id="map" class="vmaps" style="height: 800px"> </div>
             </div>
         </div>
         <!-- END WORLD PORTLET-->
     </div>
     <!-- responsive -->
     <div id="responsive" class="modal fade" tabindex="-1" data-width="500" style="width:75%;height:70%;background-color:#e2ebeb;margin-left:15%">
+    <style>
+       #sample_1_filter{
+        float: left;
+       }
+    </style>
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
             <h4 class="modal-title">Infrastructures</h4>
@@ -186,7 +216,8 @@
         <div class="modal-body">
             <div class="row">
                 <div class="col-md-12">
-                    <table class="table  table-hover table-checkable ">
+             
+                    <table class="table  table-hover table-checkable " id="sample_1">
                         <thead>
                             <tr>
 
@@ -212,7 +243,7 @@
             </div>
         </div>
         <div class="modal-footer">
-            <button type="button" data-dismiss="modal" class="btn btn-outline dark" id="close">Close</button>
+            <button type="button" data-dismiss="modal" class="btn btn-outline dark" id="close">Fermer</button>
         </div>
     </div>
 
@@ -221,7 +252,32 @@
     @php
     $imageSrc = asset('login/logo_artec.png');
     @endphp
-</div>
+
 <script src="{{asset('js/map.js')}}"></script>
+<script>
+    var dataTable;
+    //         document.addEventListener("DOMContentLoaded", function() {
+    //             dataTable= new DataTable('#sample_1', {
+    //     language: {
+    //         // url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json',
+    //         url: '../../pivottable/fr-FR.json',
+    //     },
+    //     
+    // });
+
+    //     });
+    //     $(document).ready(function() {
+    dataTable = $('#sample_1').DataTable({
+        dom: 'Bfrtip',
+        buttons: [
+            'copy', 'csv', 'excel', 'pdf'
+        ],
+        language: {
+            // url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/fr-FR.json',
+            url: '../../pivottable/fr-FR.json',
+        },
+    });
+    // } );
+</script>
 
 @endsection

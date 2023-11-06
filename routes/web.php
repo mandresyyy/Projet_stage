@@ -12,6 +12,9 @@ use App\Http\Controllers\UtilisateurContr;
 use App\Models\Type_site;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Contr_releve_signal;
+use App\Http\Controllers\Contr_stats;
+use App\Http\Controllers\PdfController;
+use App\Http\Controllers\RecuperationContr;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,7 +33,7 @@ use App\Http\Controllers\Contr_releve_signal;
 
 Route::get('/',[Contr_general::class,"to_login"])->name('login');
 
-Route::get('/rr',[Import_csv::class,"importCSV"])->name('imp');
+Route::get('/import_commune',[Import_csv::class,"importCSV"])->name('imp');
 Route::post('/authentification',[UtilisateurContr::class,"se_Connecter"])->name('se_connecter');
 Route::get('/admin/map',[Contr_general::class,"to_acceuil_admin"])->name('admin.acceuil');
 Route::get('/admin/download',[File_Contr::class,"get_model"])->name('getmodel');
@@ -88,8 +91,35 @@ Route::get('/utilisateur/map',[Contr_general::class,"to_acceuil_user"])->name('u
 Route::get('/logs',[Logs_Contr::class,"liste"])->name('logs');
 Route::post('/log/search',[Logs_Contr::class,"search"])->name('logs.search');
 
-Route::get('/admin/map/releve_signal',[Contr_releve_signal::class,"MapReleve"])->name('admin.releve_signal');
-Route::get('/utilisateur/map/releve_signal',[Contr_releve_signal::class,"MapReleveUser"])->name('utilisateur.releve_signal');
+Route::get('/admin/map/releve_signal',[Contr_releve_signal::class,"toMapReleve"])->name('admin.releve_signal');
+Route::get('/utilisateur/map/releve_signal',[Contr_releve_signal::class,"toMapReleve"])->name('utilisateur.releve_signal');
 Route::get('/new_releve_signal',[Contr_releve_signal::class,"FormReleve"])->name('new.releve_signal');
 Route::post('/new_releve_signal/save',[Contr_releve_signal::class,"upload"])->name('releve_signal.save');
-// Route::get('/teste',[Contr_general::class,"test"])->name('test');
+Route::get('/admin/releves',[Contr_releve_signal::class,"liste"])->name('admin.releve.liste');
+Route::get('/admin/releve/{id_rel}',[Contr_releve_signal::class,"delete"])->name('admin.releve.delete');
+
+Route::get('/admin/dashboard',[Contr_stats::class,"stats"])->name('admin.dashboard');
+Route::get('/admin/dashboard/{type}',[Contr_stats::class,"to_pivot"])->name('admin.pivot');
+
+Route::GET('/pdf',[PdfController::class,"generatePdf"])->name('getPDF');
+Route::POST('/pdf1',[PdfController::class,"GenerateTable"])->name('getTable');
+
+Route::get('/dashboard',[Contr_stats::class,"stats"])->name('user.dashboard');
+Route::get('/dashboard/pivot/{type}',[Contr_stats::class,"to_pivot"])->name('user.pivot');
+
+Route::get('/export',[File_Contr::class,"export"])->name('export.result');
+
+Route::get('/releve',[Contr_releve_signal::class,"toMapReleve"])->name('releve.map');
+
+Route::get('/send/recuperation/{email}',[RecuperationContr::class,"Send"])->name('email.send');
+Route::get('/verif/code/{code}',[RecuperationContr::class,"verifCode"]);
+
+Route::get('/reset',function(){
+    return view('reset');
+})->name('reset');
+
+Route::POST('/reset/motdepasse',[RecuperationContr::class,"reset_password"])->name('pwd.reset');
+
+Route::get('/district',[Contr_general::class,"get_district"]);
+Route::get('/region',[Contr_general::class,"get_region"]);
+Route::get('/admin/infra/delete/{id}',[Infra_Contr::class,"delete"])->name('infra.delete');

@@ -87,15 +87,15 @@
                             <form action="{{route('user.mdp.update')}}" method="POST">
                                 @csrf
                                 <div class="form-group">
-                                    <label class="control-label">Current Password</label>
+                                    <label class="control-label">Ancien mot de passe</label>
                                     <input type="password" class="form-control" name="current_mdp" require/>
                                 </div>
                                 <div class="form-group">
-                                    <label class="control-label">New Password</label>
+                                    <label class="control-label">Nouveau mot de passe</label>
                                     <input type="password" class="form-control" name="motdepasse" require/>
                                 </div>
                                 <div class="form-group">
-                                    <label class="control-label">Re-type New Password</label>
+                                    <label class="control-label">Retapez le nouveau mot de passe</label>
                                     <input type="password" class="form-control" name="confirmation" require/>
                                 </div>
                                 <div class="margiv-top-10">

@@ -15,4 +15,5 @@ class V_filtre_infra extends Model
     public function infra(){
         return $this->belongsTo(Infra::class,'id');
     }
+   
 }

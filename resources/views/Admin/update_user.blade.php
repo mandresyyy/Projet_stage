@@ -1,4 +1,13 @@
 @extends("Admin.Layouts.master")
+@section('nav')
+<li>
+    <a href="{{route('utilisateur.liste')}}">Utilisateur</a>
+    <i class="fa fa-angle-right"></i>
+</li>
+<li>
+    <span>Details</span>
+</li>
+@endsection
 @section('contenu')
 <div class="portlet light bordered">
     <div class="portlet-title">

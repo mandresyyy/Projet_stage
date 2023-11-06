@@ -1,5 +1,23 @@
 @extends("Admin.Layouts.master")
+@section('nav')
+<li>
+    <a href="#">Type de site</a>
+    <i class="fa fa-angle-right"></i>
+</li>
+<li>
+    <span>Liste</span>
+</li>
+@endsection
 @section('contenu')
+<!-- <script src="https://code.jquery.com/jquery-3.7.0.js"></script> -->
+<script src="{{asset('Utilitaire/jQuery.js')}}"></script>
+<!-- <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script> -->
+<script src="{{asset('Utilitaire/Data_table.min.js')}}"></script>
+<link href="{{asset('Utilitaire/datatable.min.css')}}" rel="stylesheet" type="text/css" />
+
+<!-- <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css" /> -->
+<link href="{{asset('login/assets/global/plugins/datatables/datatables.min.css')}}" rel="stylesheet" type="text/css" />
+<link href="{{asset('login/assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css')}}" rel="stylesheet" type="text/css" />
 <div class="col-md-12">
     <!-- BEGIN EXAMPLE TABLE PORTLET-->
     <div class="portlet light bordered">
@@ -29,9 +47,6 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="btn-group pull-right">
-                            <input type="search" class="form-control" id="searchInput" placeholder="Rechercher..."> 
-                        </div>
                     </div>
                 </div>
             </div>
@@ -57,7 +72,6 @@
                    
                 </tbody>
             </table>
-            {{$liste->links()}}
         </div>
     </div>
 </div>
@@ -65,31 +79,10 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    var input = document.getElementById("searchInput");
-    var table = document.getElementById("sample_1");
-    var rows = table.getElementsByTagName("tr");
-
-    input.addEventListener("input", function() {
-        var searchValue = input.value.toLowerCase();
-
-        for (var i = 1; i < rows.length; i++) { // Commence à 1 pour exclure la ligne d'en-tête
-            var cells = rows[i].getElementsByTagName("td");
-            var rowMatch = false;
-
-            for (var j = 0; j < cells.length-1; j++) {
-                var cellText = cells[j].textContent.toLowerCase();
-                if (cellText.includes(searchValue)) {
-                    rowMatch = true;
-                    break;
-                }
-            }
-
-            if (rowMatch) {
-                rows[i].style.display = "";
-            } else {
-                rows[i].style.display = "none";
-            }
-        }
-    });
+    new DataTable('#sample_1', {
+    language: {
+        url: '../../pivottable/fr-FR.json',
+    },
+});
 });
 </script>

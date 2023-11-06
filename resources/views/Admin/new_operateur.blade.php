@@ -1,4 +1,13 @@
 @extends("Admin.Layouts.master")
+@section('nav')
+<li>
+    <a href="{{route('operateur.liste')}}">Operateur</a>
+    <i class="fa fa-angle-right"></i>
+</li>
+<li>
+    <span>Ajout</span>
+</li>
+@endsection
 @section('contenu')
 <div class="portlet light bordered">
     <div class="portlet-title">
@@ -23,7 +32,7 @@
                 <div class="form-group">
                     <label class="col-md-3 control-label">Logo</label>
                     <div class="col-md-4">
-                        <input type="file" class="form-control" name="photo" placeholder="logo" value="{{ old('logo') }}" required>
+                        <input type="file" class="form-control" name="photo" placeholder="logo" value="{{ old('photo') }}" required>
                     </div>
                 </div>
                 <div class="form-group">

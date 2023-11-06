@@ -1,4 +1,13 @@
 @extends("Admin.Layouts.master")
+@section('nav')
+<li>
+    <a href="#">Releve</a>
+    <i class="fa fa-angle-right"></i>
+</li>
+<li>
+    <span>Importation de données</span>
+</li>
+@endsection
 @section('contenu')
 <link href="{{asset('login/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.css')}}" rel="stylesheet" type="text/css" />
 
@@ -8,7 +17,7 @@
         <div class="portlet light form-fit bordered">
             <div class="portlet-title">
                 <div class="caption">
-                <i class="fa fa-upload font-dark"></i>
+                    <i class="fa fa-upload font-dark"></i>
                     <span class="caption-subject font-green sbold uppercase">Import fichier de rélevé</span>
                 </div>
 
@@ -16,7 +25,7 @@
             <div class="portlet-body form">
                 <!-- BEGIN FORM-->
                 <form action=" {{route('releve_signal.save')}}" class="form-horizontal form-bordered" id="form" method="POST" enctype="multipart/form-data">
-                    @csrf                    
+                    @csrf
                     <div class="form-body">
                         <div class="form-group">
                             <label class="control-label col-md-3"></label>
@@ -31,52 +40,67 @@
                                             <span class="fileinput-new"> Selectionner un fichier </span>
                                             <input type="file" name="fichier" id="file" require> </span>
                                     </div>
-                                    </div>
-                                    <select name="operateur" class="form-control uneditable-input input-fixed input-medium">
-                                        @foreach($operateur as $op)
-                                        <option value="{{$op->operateur}}">{{$op->operateur}}</option>
-                                        @endforeach
-                                    </select>
-                                    
-
-                                
+                                </div>
                             </div>
                         </div>
-
-
-
-                    </div>
-                    <div class="form-actions">
-                        <div class="row">
-                            <div class="col-md-offset-3 col-md-9">
-                                <button class="btn green" type="submit">
-                                    <i class="fa fa-upload"></i> Importer fichier</button>
-                                
-                            </div>
+                   
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Operateur :</label>
+                        <div class="col-md-3">
+                            <select class="form-control uneditable-input input-fixed input-medium" name="operateur">
+                                @foreach($operateur as $op)
+                                    <option value='{{$op->id}}'>{{$op->operateur}}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
-                </form>
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Description :</label>
+                        <div class="col-md-3">
+                            <input type="text" name="description" class="form-control uneditable-input input-fixed input-medium">
 
+                        </div>
+                    </div>
+                    </div>
             </div>
-            @if($errors->any())
-       
-        <div class="alert alert-danger">
-            <ul>
-                @foreach($errors->all() as $error)
-                <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+
+
+            <div class="form-actions" style="height:50px;margin-top:15px">
+            <div class="row">
+                <div class="col-md-offset-3 col-md-9">
+                    <button class="btn green" type="submit">
+                        <i class="fa fa-upload"></i> Importer fichier</button>
+
+                </div>
+            </div>
+        </div>
+        </form>
+
         </div>
 
-        @endif
-        @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-        @endif
-        </div>
-        <!-- END PORTLET-->
+       
+
     </div>
+   
+</div>
+@if($errors->any())
+
+<div class="alert alert-danger">
+    <ul>
+        @foreach($errors->all() as $error)
+        <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+</div>
+
+@endif
+@if(session('success'))
+<div class="alert alert-success">
+    {{ session('success') }}
+</div>
+@endif
+<!-- END PORTLET-->
+</div>
 </div>
 </div>
 

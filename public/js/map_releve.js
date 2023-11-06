@@ -1,130 +1,206 @@
+        function popup(feature,layer){
+            var popupContent ='<table style="font-size:12px">';
+            var popupContent = popupContent + '<tr><td><strong>Operateur :</td><td> ' + feature.properties.operateur  + '</td></tr>';
+            var popupContent = popupContent + '<tr><td><strong>Date :</td> <td>' + feature.properties.date_releve + '</td></tr>';
+            var popupContent = popupContent + '<tr><td><strong>Description :</td> <td>' + feature.properties.description + '</td></tr>';
+            var popupContent = popupContent + '<tr><td><strong>Signal capté :</td><td> ' + feature.properties.capter  + '</td></tr>';
+            var popupContent = popupContent + '<tr><td><strong>Technologie :</td><td> ' + feature.properties.technologie  + '</td></tr>';
+            var popupContent = popupContent + '<tr><td><strong>Niveau de signal :</td><td> ' + feature.properties.level + '</td></tr>';
+            var popupContent = popupContent + '<tr><td><strong>Vitesse :</td><td> ' + feature.properties.speed  + '</td></tr>';
+            var popupContent = popupContent + '<tr><td><strong>Altitude :</td><td> ' + feature.properties.altitude  + '</td></tr></table>';
+            layer.bindPopup(popupContent);
+        }
 
-        window.onload = function() {
-            var map = L.map('map').setView([-18.8792, 46.3504], 8); // initialisation de la carte
+        
+            var map = L.map('map').setView([-18.8792, 46.3504], 6); // initialisation de la carte
             var tuile = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { // ajout tuile
                 maxZoom: 25,
                 attribution: '© OpenStreetMap'
             }).addTo(map);
            
             // var layerControl = L.control.layers().addTo(map);
+            var contr = L.control.layers(null, null, {
+                collapsed: false
+            }).addTo(map);
+            contr.setPosition('topleft');
             var layerControl = L.control.layers(null, null, {
                 collapsed: false
             }).addTo(map);
+           
             var group = L.layerGroup();
 
-            // console.log(operateur[0]['operateur']);
-
-            // // console.log(signal[0][0]['Longitude']);
-            for (let z = 0; z < operateur.length; z++) {
-                let op = operateur[z]['operateur'];
-                var group = L.layerGroup();
-                console.log(signal[op]);
-                for (let i = 0; i < signal[op].length; i++) {
-                    for (let x = 0; x < signal[op][i].length; x++) {
-                        // console.log(signal[i][x]);
-                        let mark = L.circle([signal[op][i][x]['Latitude'], signal[op][i][x]['Longitude']], {
-                            color: signal[op][i][x]['couleur'],
-                            fillColor: signal[op][i][x]['couleur'],
-                            fillOpacity: 1,
-                            radius: 3,
-                            weight: 3,
-                            // dashArray: '5.5'
-                        });
-                    var popupContent ='<table style="font-size:12px">';
-                    var popupContent = popupContent + '<tr><td><strong>Date :</td> <td>' + signal[op][i][x]['Timestamp'].split("_")[0] + '</td></tr>';
-                    var popupContent = popupContent + '<tr><td><strong>Operateur :</td><td> ' + signal[op][i][x]['Operatorname']  + '</td></tr>';
-                    var popupContent = popupContent + '<tr><td><strong>Technologie :</td><td> ' + signal[op][i][x]['NetworkTech']  + '</td></tr>';
-                    var popupContent = popupContent + '<tr><td><strong>Niveau de signal :</td><td> ' + signal[op][i][x]['Level']  + '</td></tr>';
-                    var popupContent = popupContent + '<tr><td><strong>Vitesse :</td><td> ' + signal[op][i][x]['Speed']  + '</td></tr>';
-                    var popupContent = popupContent + '<tr><td><strong>Altitude :</td><td> ' + signal[op][i][x]['Altitude']  + '</td></tr></table>';
-                        // Associez le popup au cercle
-                        mark.bindPopup(popupContent);
-
-                        // Ajoutez un gestionnaire d'événements 'click' au cercle
-                        mark.on('click', function(event) {
-                            // Ouvrez le popup lorsque le cercle est cliqué
-                            mark.openPopup();
-                        });
-                        group.addLayer(mark);
-                    }
-                    //    console.log(i);
+            function releveByoperateur(){
+                for (let z = 0; z < operateur.length; z++) {
+                    let groupop = L.layerGroup();
+                    let nom_fichier="/geojson/releve/"+operateur[z].operateur+".geojson";
+                    fetch(nom_fichier)
+                        .then(response => response.json())
+                        .then(data=>{
+                            groupop.addLayer(L.geoJSON(data,{
+                                pointToLayer:function(feature,latlng){
+                                    return L.circleMarker(latlng,{
+                                        color:feature.properties.couleur,
+                                        fillColor:feature.properties.couleur,
+                                        fillOpacity:1,
+                                        radius:1.5,
+                                        weight:1.5,
+                                    });
+                                },
+                                onEachFeature:popup,
+                            }));
+                        })
+                        .catch(error => console.error('Erreur :', error));
+                    layerControl.addOverlay(groupop, operateur[z].operateur);
+    
                 }
-                layerControl.addOverlay(group, op);
-                // group.addTo(map);
-
+    
             }
+            
+            function releveBytech(){
+                for (let z = 0; z < tech.length; z++) {
+                    let grouptech = L.layerGroup();
+                    let nom_fichier="/geojson/releve/"+tech[z].generation+".geojson";
+                    fetch(nom_fichier)
+                        .then(response => response.json())
+                        .then(data=>{
+                            grouptech.addLayer(L.geoJSON(data,{
+                                pointToLayer:function(feature,latlng){
+                                    return L.circleMarker(latlng,{
+                                        color:feature.properties.couleur,
+                                        fillColor:feature.properties.couleur,
+                                        fillOpacity:0,
+                                        radius:3,
+                                        weight:0.5,
+                                    });
+                                },
+                                onEachFeature:popup,
+                            }));
+                        })
+                        .catch(error => console.error('Erreur :', error));
+                    layerControl.addOverlay(grouptech, tech[z].generation);
+    
+                }
+            }
+           
 
-            function show_couche(nom_couche) {
-                var nom_fichier = '/geojson/' + nom_couche + '.json';
+            function loadGeoJSONData(url) {
+                return new Promise((resolve, reject) => {
+                  fetch(url)
+                    .then(response => {
+                      if (!response.ok) {
+                        reject(new Error(`Erreur de chargement du fichier : ${response.statusText}`));
+                        return;
+                      }
+                      return response.json();
+                    })
+                    .then(data => {
+                      // console.log(data);
+                      resolve(data);
+                    })
+                    .catch(error => {
+                      reject(error);
+                    });
+                });
+              }
+              
+              
+              function showCouche(json_name) {
+                var marks = "/geojson/"+json_name+".topojson"; 
+                var legende='';
                 var LayerGroup = L.featureGroup();
-                var legende = '';
-                if (nom_couche == 'Rgion') {
+            
+                if(json_name=='region'){
+                    legende='<span style="background-color: transparent; width: 15px; height: 15px; display: inline-block; margin-right: 5px; border: 3px solid green;"></span>Region';
+            
                     var option = {
-                        color: 'green',
-                        fillOpacity: 0,
-                        weight: 3
+                        color: 'green', 
+                        fillOpacity:0,
+                        weight: 2
                     };
-                    legende = '<span style="background-color: transparent; width: 15px; height: 15px; display: inline-block; margin-right: 5px; border: 3px solid green;"></span>Region';
-                    var couche = L.geoJSON(json_Rgion_1, {
-                        style: option,
-                        onEachFeature: function(feature, layer) {
-                            // console.log(feature.properties.NOMREGION);
-                            var contenu = '<table>';
-                            var contenu = contenu + '<tr><td><strong>Code region :</td> <td>' + feature.properties.CODEREG + '</td></tr>';
-                            var contenu = contenu + '<tr><td><strong>Region :</td><td> ' + feature.properties.NOMREGION + '</td></tr></table>';
-
-                            layer.bindPopup(contenu);
-                            var customLabelIcon = L.divIcon({
-                                className: 'custom-label-icon',
-                                iconSize: [70, 40],
-                                html: '<div class="custom-label" style="color:green">' + feature.properties.NOMREGION + '</div>',
-                            });
-                            LayerGroup.addLayer(L.marker(layer.getBounds().getCenter(), {
-                                icon: customLabelIcon
-                            }));
-                        }
-                    });
-
-                } else {
-                    var option = {
-                        fillOpacity: 0,
-                        color: 'blue',
-                        weight: 1
-                    };
-                    legende = '<span style="background-color: transparent; width: 15px; height: 15px; display: inline-block; margin-right: 5px; border: 3px solid blue;"></span>District';
-                    var couche = L.geoJSON(json_District_2, {
-                        style: option,
-                        onEachFeature: function(feature, layer) {
-                            // console.log(feature.properties.NOMDIST);
-                            var contenu = '<table>';
-                            var contenu = contenu + '<tr><td><strong>Code region :</td> <td>' + feature.properties.CODEDIST + '</td></tr>';
-                            var contenu = contenu + '<tr><td><strong>District :</td><td> ' + feature.properties.NOMDIST + '</td></tr></table>';
-                            layer.bindPopup(contenu);
-                            var customLabelIcon = L.divIcon({
-                                className: 'custom-label-icon',
-                                iconSize: [70, 40],
-                                html: '<div class="custom-label" style="color:blue">' + feature.properties.NOMDIST + '</div>',
-                            });
-                            LayerGroup.addLayer(L.marker(layer.getBounds().getCenter(), {
-                                icon: customLabelIcon
-                            }));
-                        }
-                    });
+                
+                    fetch(marks)
+                        .then(response => response.json())
+                        .then(topojsonData => {
+                            const geojson = topojson.feature(topojsonData, topojsonData.objects.collection);
+                
+                            LayerGroup.addLayer(L.geoJSON(geojson,{
+                                style:option,
+                                onEachFeature:function(feature,layer){
+                                    // console.log(feature.properties.NOMREGION);
+                                    var contenu = '<table>';
+                                    var contenu = contenu + '<tr><td><strong>Code region :</td> <td>' + feature.properties.CODEREG + '</td></tr>';
+                                    var contenu = contenu + '<tr><td><strong>Region :</td><td> ' + feature.properties.NOMREGION + '</td></tr></table>';
+                                    layer.bindPopup(contenu);
+                                    var customLabelIcon = L.divIcon({
+                                        className: 'custom-label-icon', 
+                                        iconSize: [70, 40], 
+                                        html: '<div class="custom-label" style="color:green">' + feature.properties.NOMREGION + '</div>', 
+                                    });
+                                    LayerGroup.addLayer(L.marker(layer.getBounds().getCenter(), { icon: customLabelIcon }));
+                                }
+                            }))
+                        })
+                        .catch(error => console.error('Erreur :', error));
+                
+                        layerControl.addOverlay(LayerGroup,legende);
                 }
-                LayerGroup.addLayer(couche);
-                layerControl.addOverlay(LayerGroup, legende);
-
+            
+                else{
+                    legende='<span style="background-color: transparent; width: 15px; height: 15px; display: inline-block; margin-right: 5px; border: 3px solid blue;"></span>District';
+            
+                    var option = {
+                        color: 'blue', 
+                        fillOpacity:0,
+                        weight:1
+                    };
+                
+                    fetch(marks)
+                        .then(response => response.json())
+                        .then(topojsonData => {
+                            const geojson = topojson.feature(topojsonData, topojsonData.objects.collection);
+                
+                            LayerGroup.addLayer(L.geoJSON(geojson,{
+                                style:option,
+                                onEachFeature:function(feature,layer){
+                                    var contenu = '<table>';
+                                    var contenu = contenu + '<tr><td><strong>Code district :</td> <td>' + feature.properties.CODEDIST + '</td></tr>';
+                                    var contenu = contenu + '<tr><td><strong>District :</td><td> ' + feature.properties.NOMDIST + '</td></tr></table>';
+                                    layer.bindPopup(contenu);
+                                    var customLabelIcon = L.divIcon({
+                                        className: 'custom-label-icon', 
+                                        iconSize: [70, 40], 
+                                        html: '<div class="custom-label" style="color:blue">' + feature.properties.NOMDIST + '</div>', 
+                                    });
+                                    LayerGroup.addLayer(L.marker(layer.getBounds().getCenter(), { icon: customLabelIcon }));
+                                }
+                            }))
+                        })
+                        .catch(error => console.error('Erreur :', error));
+                
+                        layerControl.addOverlay(LayerGroup,legende);
+                }
+                
             }
+              
+            // window.onload = () => {
+                var c1 = 'region';
+                var c2 = 'district';
+             
+               showCouche(c1);   
+               showCouche(c2);
+            // };
+               
+               
 
             function onEachFeature(feature, layer) {
                 if (feature.properties) {
-
-                    var contenu = '<center><img src="../login/logo_artec.png" alt="tsita" style="width:50px"></center>';
-                    var contenu = contenu + '<img src="../storage/photos/' + feature.properties.logo + '" style="width:20px;float:right">';
+                    var contenu = '<center><img src="../../login/logo_artec.png" alt="tsita" style="width:50px"></center>';
+                    var contenu = contenu + '<img src="../../storage/photos/' + feature.properties.logo + '" style="width:20px;float:right">';
                     var contenu = contenu + '<table style="font-size:12px">';
                     var contenu = contenu + '<tr><td><strong>Operateur :</td> <td>' + feature.properties.operateur + '</td></tr>';
                     var contenu = contenu + '<tr><td><strong>Nom du site :</td><td> ' + feature.properties.nom_site + '</td></tr>';
                     var contenu = contenu + '<tr><td><strong>Technologie :</td> <td>' + feature.properties.technologie_generation + '</td></tr>';
+                    var contenu = contenu + '<tr><td><strong>Details :</td> <td>' + feature.properties.details + '</td></tr>';                    
                     var contenu = contenu + '<tr><td><strong>Hauteur antenne  (m):</td><td>' + feature.properties.hauteur_antenne + ' </td></tr>';
                     var contenu = contenu + '<tr><td><strong>Largeur des canaux occupés (MHz) :</td><td>' + feature.properties.largeur_canaux + ' </td></tr>';
                     var contenu = contenu + '<tr><td><strong>Commune :</td><td>' + feature.properties.commune + ' </td></tr>';
@@ -186,12 +262,13 @@
             }
 
 
-            var c1 = 'Rgion';
-            var c2 = 'District_2';
+           
             show_infra();
-            show_couche(c2);
-            show_couche(c1);
-            var customContainer = L.DomUtil.create('div', 'custom-container');
+            releveByoperateur();
+            releveBytech();
+            show_legend();
+            function show_legend(){
+                 var customContainer = L.DomUtil.create('div', 'custom-container');
             customContainer.innerHTML = '<div class="custom-info">' +
                 '<span style="background-color: #0f1112; width: 5px; height: 5px; display: inline-block; margin-right: 5px; border-radius: 100%;"></span>' +
                 '-200 - -120' +
@@ -220,7 +297,9 @@
                 '-71 - -50' +
                 '</div>';
 
-            layerControl.getContainer().appendChild(customContainer);
+                contr.getContainer().appendChild(customContainer);
 
+            }
+           
 
-        }
+        

@@ -21,13 +21,14 @@ License: You must have a valid license purchased only from themeforest(the above
 
 <head>
     <meta charset="utf-8" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Metronic | Blank Page Layout</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="width=device-width, initial-scale=1" name="viewport" />
     <meta content="" name="description" />
     <meta content="" name="author" />
     <!-- BEGIN GLOBAL MANDATORY STYLES -->
-    <link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all" rel="stylesheet" type="text/css" />
+    <link href="{{asset('css/font.googleapis.css')}}" rel="stylesheet" type="text/css" />
     <link href="{{asset('login/assets/global/plugins/font-awesome/css/font-awesome.min.css')}}" rel="stylesheet" type="text/css" />
     <link href="{{asset('login/assets/global/plugins/simple-line-icons/simple-line-icons.min.css')}}" rel="stylesheet" type="text/css" />
     <link href="{{asset('login/assets/global/plugins/bootstrap/css/bootstrap.min.css')}}" rel="stylesheet" type="text/css" />
@@ -49,7 +50,7 @@ License: You must have a valid license purchased only from themeforest(the above
 </head>
 <!-- END HEAD -->
 
-<body class="page-header-fixed page-sidebar-closed-hide-logo page-content-white">
+<body class="page-header-fixed page-sidebar-closed-hide-logo page-content-gray">
     <!-- BEGIN HEADER -->
     <div class="page-header navbar navbar-fixed-top">
         <!-- BEGIN HEADER INNER -->
@@ -57,8 +58,8 @@ License: You must have a valid license purchased only from themeforest(the above
             <!-- BEGIN LOGO -->
             <div class="page-logo">
                 <a href="index.html">
-                <img src="{{asset('logo_artec_sans_cercle.png')}}" alt="Artec" style="width:100px;margin-left:25px;margin-top:10px" /> </a>
-                <div class="menu-toggler sidebar-toggler">
+                    <img src="{{asset('login/logo_artec.png')}}" style="width: 86px;margin-top:0px;margin-left:40px" alt="Artec" class="logo-default"/> </a>
+                <div class="menu-toggler sidebar-toggler" >
                     <span></span>
                 </div>
             </div>
@@ -135,32 +136,14 @@ License: You must have a valid license purchased only from themeforest(the above
                         <!-- END SIDEBAR TOGGLER BUTTON -->
                     </li>
                     <!-- DOC: To remove the search box from the sidebar you just need to completely remove the below "sidebar-search-wrapper" LI element -->
-                    <li class="sidebar-search-wrapper">
-                        <!-- BEGIN RESPONSIVE QUICK SEARCH FORM -->
-                        <!-- DOC: Apply "sidebar-search-bordered" class the below search form to have bordered search box -->
-                        <!-- DOC: Apply "sidebar-search-bordered sidebar-search-solid" class the below search form to have bordered & solid search box -->
-                        <form class="sidebar-search  sidebar-search-bordered" action="page_general_search_3.html" method="POST">
-                            <a href="javascript:;" class="remove">
-                                <i class="icon-close"></i>
-                            </a>
-                            <div class="input-group">
-                                <input type="text" class="form-control" placeholder="Search...">
-                                <span class="input-group-btn">
-                                    <a href="javascript:;" class="btn submit">
-                                        <i class="icon-magnifier"></i>
-                                    </a>
-                                </span>
-                            </div>
-                        </form>
-                        <!-- END RESPONSIVE QUICK SEARCH FORM -->
-                    </li>
-                    <li class="nav-item start ">
-                        <a href="dashboard_3.html" class="nav-link ">
+                    
+                    <li class="nav-item start @if($page=='stats') active @endif">
+                        <a href="{{route('user.dashboard')}}" class="nav-link ">
                             <i class="icon-bar-chart"></i>
                             <span class="title">Statistiques</span>
                         </a>
                     </li>
-                    <li class="nav-item start ">
+                    <li class="nav-item start @if($page=='map') active @endif">
                         <a href="{{route('user.acceuil')}}" class="nav-link ">
                             <i class="fa fa-map-o"></i>
                             <span class="title">Carte des infrastructures</span>
@@ -168,7 +151,7 @@ License: You must have a valid license purchased only from themeforest(the above
 
 
                     </li>
-                    <li class="nav-item start ">
+                    <li class="nav-item start @if($page=='releve') active @endif">
                         <a href="{{route('utilisateur.releve_signal')}}" class="nav-link ">
                             <i class="fa fa-map-o"></i>
                             <span class="title">Carte relevé signal</span>
@@ -196,7 +179,14 @@ License: You must have a valid license purchased only from themeforest(the above
 
                 <!-- END THEME PANEL -->
                 <!-- BEGIN PAGE BAR -->
-                
+                <div class="page-bar">
+                        <ul class="page-breadcrumb">
+                            @yield('nav')
+                        </ul>
+                        <div class="page-toolbar">
+                            
+                        </div>
+                    </div>
 
                    
                         
@@ -206,7 +196,7 @@ License: You must have a valid license purchased only from themeforest(the above
                 
                 <!-- END PAGE TITLE-->
                 <!-- END PAGE HEADER-->
-                <div class="row">
+                <div class="row" >
                     @yield('contenu')
                 </div>
                 <!-- END CONTENT BODY -->
@@ -239,15 +229,7 @@ License: You must have a valid license purchased only from themeforest(the above
         <script src="{{asset('login/assets/global/plugins/jquery.blockui.min.js')}}" type="text/javascript"></script>
         <script src="{{asset('login/assets/global/plugins/bootstrap-switch/js/bootstrap-switch.min.js')}}" type="text/javascript"></script>
         <!-- END CORE PLUGINS -->
-         <!-- BEGIN PAGE LEVEL PLUGINS -->
-         <script src="{{asset('login/assets/global/scripts/datatable.js')}}" type="text/javascript"></script>
-        <script src="{{asset('login/assets/global/plugins/datatables/datatables.min.js')}}" type="text/javascript"></script>
-        <script src="{{asset('login/assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js')}}" type="text/javascript"></script>
-        <!-- END PAGE LEVEL PLUGINS -->
-        <!-- BEGIN PAGE LEVEL SCRIPTS -->
-        <script src="{{asset('login/assets/pages/scripts/table-datatables-managed.min.js')}}" type="text/javascript"></script>
-        <!-- END PAGE LEVEL SCRIPTS -->
-     
+       
 
         <!-- BEGIN THEME GLOBAL SCRIPTS -->
         <script src="{{asset('login/assets/global/scripts/app.min.js')}}" type="text/javascript"></script>

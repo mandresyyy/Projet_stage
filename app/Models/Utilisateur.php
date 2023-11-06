@@ -35,6 +35,17 @@ class Utilisateur extends Authenticatable
             return false;
         }
     }
+    function verifierMailrecuperation(){
+        $util=Utilisateur::where('email','=',$this->email)->first();
+        if($util == null){
+            // dd(true);
+            return false;
+        }
+        else{
+            // dd(false);
+            return $util;
+        }
+    }
     function checkMail2(){ 
         $util=Utilisateur::where('email','=',$this->email)
         ->where('id','!=',$this->id)
@@ -119,7 +130,7 @@ class Utilisateur extends Authenticatable
             }
             else{ 
                 $u=Utilisateur::find($this->id);
-                $u->motdepasse=$this->motdepasse;
+                $u->motdepasse=bcrypt($this->motdepasse);
                 $u->save();
                 return true;
             }

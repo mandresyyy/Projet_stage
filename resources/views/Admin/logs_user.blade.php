@@ -1,4 +1,13 @@
 @extends("Admin.Layouts.master")
+@section('nav')
+<li>
+    <a href="#">Logs</a>
+    <i class="fa fa-angle-right"></i>
+</li>
+<!-- <li>
+    <span>Liste</span>
+</li> -->
+@endsection
 @section('contenu')
 <div class="col-md-12">
     <!-- BEGIN EXAMPLE TABLE PORTLET-->

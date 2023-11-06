@@ -1,4 +1,13 @@
 @extends("Admin.Layouts.master")
+@section('nav')
+<li>
+    <a href="{{route('infra.liste')}}">Infrastructure</a>
+    <i class="fa fa-angle-right"></i>
+</li>
+<li>
+    <span>Details</span>
+</li>
+@endsection
 @section('contenu')
 <!-- Inclure jQuery -->
 <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
@@ -170,14 +179,8 @@
                         </div>
                         <div class="col-md-6">
                             <label class="control-label">Colocataire</label>
-                            <select name="coloc" class="form-control">
-                                <option value="{{$infra->id_colloc}}">{{$infra->coloc->operateur}}</option>
-                                @foreach($listeop1 as $op)
-                                @if($op->id!=$infra->id_colloc)
-                                <option value="{{$op->id}}">{{$op->operateur}}</option>
-                                @endif
-                                @endforeach
-                            </select>
+                            <input class="form-control" name="coloc"  value="{{$infra->coloc}}" >
+
                         </div>
 
 
@@ -186,7 +189,7 @@
                     <div class="col-md-12" style="margin-top: 20px;">
 
                         <a id="valider1" class="btn green"> Valider</a>
-                        <a href="{{route('infra.liste')}}" class="btn default"> Retour </a>
+                        <a href="{{route('infra.liste')}}" class="btn default" id="back"> Retour </a>
                     </div>
 
 
@@ -309,7 +312,7 @@
         });
 
         var mutualiseRadio = document.querySelectorAll("input[name='mutualise']");
-        var colocSelect = document.querySelector("select[name='coloc']");
+        var colocSelect = document.querySelector("input[name='coloc']");
 
         // Fonction pour mettre à jour le champ "Colocataire"
         function updateColocField() {
@@ -317,7 +320,7 @@
 
             if (mutualiseValue === "0") {
                 colocSelect.disabled = true;
-                colocSelect.value = "1";
+                colocSelect.value = "";
             } else {
                 colocSelect.disabled = false;
             }

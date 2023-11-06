@@ -24,6 +24,10 @@ class Source_energie extends Model
         return $check;
     }
 
+    public function infras() {
+        return $this->belongsToMany(Source_energie::class, 'infra_source', 'id_infra', 'id_source');
+    }
+
     public function getOrcreateID(){
         $src=Source_energie::where('source','=',$this->source)->first();
         

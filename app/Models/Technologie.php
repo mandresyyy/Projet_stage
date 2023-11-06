@@ -45,4 +45,8 @@ class Technologie extends Model
         }
         return $check;
     }
+
+    public function infras() {
+        return $this->belongsToMany(Infra::class, 'infra_technologie', 'id_technologie', 'id_infra');
+    }
 }

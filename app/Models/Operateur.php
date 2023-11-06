@@ -32,4 +32,14 @@ class Operateur extends Model
             return false;
         }
     }
+    public function notIn($liste){
+        $check=true;
+        foreach($liste as $l){
+            if($l->operateur->id==$this->id){
+                $check=false;
+                break;
+            }
+        }
+        return $check;
+    }
 }

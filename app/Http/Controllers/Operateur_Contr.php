@@ -7,21 +7,22 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Logs;
 use App\Models\Type_action;
-
+use Illuminate\Support\Facades\DB;
 class Operateur_Contr extends Controller
 {
     public function liste()
     {
         if (auth()->check()) {
             $utilisateur = auth()->user();
-            $liste = Operateur::where('operateur', '!=', 'Non defini')->paginate(7);
+            $liste = Operateur::where('operateur', '!=', 'Non defini')->get();
             $action = new Logs();
             $action->id_utilisateur = auth()->user()->id;
             $idtypeaction = Type_action::where('action', '=', 'liste')->pluck('id')->first();
             $action->id_type_action = $idtypeaction;
             $action->detail = 'Liste operateurs ';
             $action->newLogs();
-            return view('Admin/liste_operateur', compact('utilisateur', 'liste'));
+            $page='op';
+            return view('Admin/liste_operateur', compact('page','utilisateur', 'liste'));
         } else {
             return redirect()->route('login');
         }
@@ -30,7 +31,8 @@ class Operateur_Contr extends Controller
     {
         if (auth()->check()) {
             $utilisateur = auth()->user();
-            return view('Admin/new_operateur', compact('utilisateur'));
+            $page='op';
+            return view('Admin/new_operateur', compact('page','utilisateur'));
         } else {
             return redirect()->route('login');
         }
@@ -61,7 +63,14 @@ class Operateur_Contr extends Controller
                     'operateur' => $op->operateur,
                     'couleur' => $op->couleur
                 ]);
-
+                DB::table('mise_a_jour')->where("domaine",'=','operateur')->update([
+                    "domaine"=>'operateur',
+                    "etat"=>'1'
+                ]);
+                DB::table('mise_a_jour')->where("domaine",'=','operateur_releve')->update([
+                    "domaine"=>'operateur_releve',
+                    "etat"=>'1'
+                ]);
                 $action=new Logs();
                 $action->id_utilisateur=auth()->user()->id;
                 $idtypeaction=Type_action::where('action','=','insertion')->pluck('id')->first();
@@ -83,7 +92,8 @@ class Operateur_Contr extends Controller
         if (auth()->check()) {
             $utilisateur = auth()->user();
             $oper=Operateur::find($idUpdate);
-            return view('Admin/update_operateur', compact('utilisateur','oper'));
+            $page='op';
+            return view('Admin/update_operateur', compact('page','utilisateur','oper'));
         } else {
             return redirect()->route('login');
         }
@@ -97,10 +107,11 @@ class Operateur_Contr extends Controller
             $op->couleur = $request->input('couleur');
             // upload photo
             if($op->check2()){
-                $request->validate([
-                    'photo' => 'required|image|max:2048',
-                ]);
-
+                if($request->input('photo')!=null){
+                    $request->validate([
+                        'photo' => 'required|image|max:2048',
+                    ]);
+                    
                 $tempFilePath = $request->file('photo')->getRealPath();
 
                 $fileName = uniqid() . '.' . $request->file('photo')->getClientOriginalExtension();
@@ -108,6 +119,8 @@ class Operateur_Contr extends Controller
                 $filePath = $request->file('photo')->storeAs('public/photos', $fileName);
 
                 $op->logo=$fileName;
+                }
+
                 $op->save();
                 $action=new Logs();
                 $action->id_utilisateur=auth()->user()->id;
@@ -115,6 +128,14 @@ class Operateur_Contr extends Controller
                 $action->id_type_action=$idtypeaction;
                 $action->detail='Modification operateur :'.$request->input('operateur');
                 $action->newLogs();
+                DB::table('mise_a_jour')->where("domaine",'=','operateur')->update([
+                    "domaine"=>'operateur',
+                    "etat"=>'1'
+                ]);
+                DB::table('mise_a_jour')->where("domaine",'=','operateur_releve')->update([
+                    "domaine"=>'operateur_releve',
+                    "etat"=>'1'
+                ]);
                 // Redirigez l'utilisateur avec un message de succès
                 return redirect()->back()->with('success', 'opérateur modifier avec succès.');
             }

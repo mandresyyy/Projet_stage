@@ -16,7 +16,8 @@ class Logs_Contr extends Controller
             $utilisateur=auth()->user();
             $liste=Logs::orderBy('date','DESC')->paginate(20);
             $action=Type_action::all();
-            return view ('Admin/logs_user',compact('utilisateur','liste','action'));
+            $page='logs';
+            return view ('Admin/logs_user',compact('page','utilisateur','liste','action'));
         }
         else{
             return redirect()->route('login');
@@ -77,7 +78,8 @@ class Logs_Contr extends Controller
                         ->where('id_utilisateur','=',$idutil)
                         ->paginate(20);
             }
-            return view ('Admin/logs_user',compact('utilisateur','liste','action'));
+            $page='logs';
+            return view ('Admin/logs_user',compact('page','utilisateur','liste','action'));
         }
         else{
             return redirect()->route('login');
