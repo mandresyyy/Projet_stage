@@ -1,0 +1,8 @@
+.custom-popup {
+    width: 400px; /* Largeur du pop-up en pixels */
+    height: auto; /* Hauteur automatique en fonction du contenu */
+    font-size: 14px; /* Taille de police */
+    background-color: #fff; /* Couleur de fond */
+    border: 2px solid #ccc; /* Bordure */
+    padding: 10px; /* Marge intérieure */
+  }
