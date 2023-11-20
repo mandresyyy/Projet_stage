@@ -9,12 +9,7 @@
 </li>
 @endsection
 @section('contenu')
-<!-- Inclure jQuery -->
-<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
-
-<!-- Inclure jQuery UI -->
-<!-- <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"> -->
-<!-- <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script> -->
+<script src="{{asset('Utilitaire/sweetalert.min.js')}}"></script>
 
 
 <div class="row profile-account">
@@ -64,10 +59,16 @@
         @endif
         @endif
         @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-        @endif
+    <script>
+        Swal.fire({
+            title: 'Succès!',
+            text: "{{ session('success') }}",
+            icon: 'success',
+            confirmButtonText: 'OK'
+        });
+    </script>
+@endif
+
     </div>
     <div class="col-md-9">
         <div class="tab-content">

@@ -1,4 +1,24 @@
-var map = L.map('map').setView([-18.8792, 46.3504], 6); // initialisation de la carte
+function startSpinner() {
+    var spinner = document.getElementById("spinner");
+    var button = document.getElementById("spinButton");
+
+    // Ajouter la classe 'hidden' pour masquer le bouton
+    button.classList.add("hidden");
+
+    // Retirer la classe 'hidden' pour afficher le spinner
+    spinner.classList.remove("hidden");
+
+    // Simuler une opération asynchrone (peut être remplacée par une véritable opération asynchrone)
+    setTimeout(function () {
+        // Retirer la classe 'hidden' pour afficher à nouveau le bouton
+        button.classList.remove("hidden");
+
+        // Ajouter la classe 'hidden' pour masquer le spinner
+        spinner.classList.add("hidden");
+    }, 3000); // Remplacez 3000 par la durée de votre opération asynchrone (en millisecondes)
+}
+
+var map = L.map('map').setView([-18.8792, 46.3504], 8); // initialisation de la carte
 var tuile = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { // ajout tuile
     maxZoom: 25,
     attribution: '© OpenStreetMap'
@@ -49,27 +69,24 @@ function onEachFeature(feature, layer) {
 
 
 function showMarqueur(json_name) {
-    // console.log(json_name);
-  
 
-    // var marks = "/geojson/testa.geojson";
+//    console.time('showMarqueur');
     
     if (window['marks'] != null) {
         // console.log("misy");
         window['marks'].clearLayers();
         map.removeLayer(window['marks']);
     }
+    if (window['marquage'] != null) {
+        map.removeLayer(window['marquage']);
+}
 
-   
-    // fetch(marks)
-    //     .then(response => response.json())
-    //     .then(data => {
 
     group.addLayer(L.geoJSON(json_name, {
                 pointToLayer: function (feature, latlng) {
                     let lon = parseFloat(latlng.lng);
                     let lat = parseFloat(latlng.lat);
-                    let demi = 0.005;
+                    let demi = 0.0005;
                     if (isNaN(lon) || isNaN(lat)) {
                         console.log(feature);
                     }
@@ -84,22 +101,22 @@ function showMarqueur(json_name) {
                         var circle = L.circle([lat, lon], {
                             color: 'purple',
                             fillColor: '##BA55D3',
-                            fillOpacity: 0.5,
-                            radius: 25
+                            fillOpacity: 0,
+                            radius: 10
                         });
                         group.addLayer(circle);
                     }
-                   return carre
+                    return carre
                     
                 },
 
                 onEachFeature: onEachFeature,
 
             }));
-        // })
-        // .catch(error => console.error('Erreur :', error));
     group.addTo(map);
     window['marks'] = group;
+    // console.log("finish");
+    // console.timeEnd('showMarqueur');
 }
 
 function showCouche(json_name) {
@@ -226,7 +243,7 @@ selectMultiples.forEach(function (select) {
         }
         // console.log(technologie);
         // console.log(region);
-        search();
+        // search();
 
     });
 });
@@ -235,9 +252,13 @@ var mutualise = document.getElementById('mutualise');
 mutualise.addEventListener('change', function () {
     t_mutualise = this.value;
     //    console.log(t_mutualise);
-    search();
+    // search();
 })
 
+var btn_search = document.getElementById('spinButton');
+btn_search.addEventListener('click', function(){
+        search();
+});
 
 function search() {
     $.ajax({
@@ -254,7 +275,8 @@ function search() {
         success: function (data) {
             // console.log(data);
             // console.log(JSON.parse(data[1]));
-            showMarqueur(JSON.parse(data[1])); //
+            showMarqueur(JSON.parse(data[1])); 
+            dataTable.clear().draw();
             data[0].forEach(function (d) {
                 var rowData = [
                     d.infra.nom_site,
@@ -291,7 +313,7 @@ function search() {
                 // Faites quelque chose avec les valeurs de latitude et de longitude
                 window['marquage'] = L.marker([latitude, longitude]);
                 window['marquage'].addTo(map);
-                map.flyTo([latitude, longitude], 12, { duration: 1.5 });
+                map.flyTo([latitude, longitude], 15, { duration: 1.5 });
         
                 let close = document.getElementById('close');
                 close.click();

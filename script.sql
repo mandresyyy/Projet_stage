@@ -185,7 +185,7 @@ where latitude is not null and longitude is not  null;
 -- create or replace view v_all_info_utilisateur as
 -- select utilisateur.* ,etat_compte.etat from utilisateur join etat_compte on utilisateur.id_etat_compte=etat_compte.id;
 
-insert into type_action (action) values ('Connexion'),('Recherche'),('statistique'),('modification'),('insertion'),('liste');
+insert into type_action (action) values ('Connexion'),('Recherche'),('statistique'),('modification'),('insertion'),('liste'),('suppression');
 
 
 -- dashboard
@@ -195,7 +195,7 @@ create or replace view Liste_Region as select region,code_r from commune group b
 create or replace view Liste_District as select district,code_d,code_r,region from commune group by district,code_d,region,code_r; 
 
 --  region_district_operateur 
-create or replace view Liste_Operateur as select id,operateur from operateur where operateur!='Non defini';
+create or replace view Liste_Operateur as select id,operateur,couleur from operateur where operateur!='Non defini';
 -- on infra.id_operateur=Liste_Operateur.id 
 -- create or replace view v_Operateur_geographique as select * from Liste_District full join Liste_Operateur ;
 -- create or replace view v_Operateur_geographique as select * from Liste_District full join Liste_Operateur ;
@@ -284,11 +284,11 @@ infra_technologie join technologie on infra_technologie.id_technologie=technolog
 
 
 -- stats par source  
-create or replace view v_Infra_Source as select v_Infra_Commune_Operateur_Type.*,source_energie.source,source_energie.id as id_source
-from infra_source join v_Infra_Commune_Operateur_Type on infra_source.id_infra=v_Infra_Commune_Operateur_Type.id_infra 
-join source_energie on source_energie.id=infra_source.id_source;
+-- create or replace view v_Infra_Source as select v_Infra_Commune_Operateur_Type.*,source_energie.source,source_energie.id as id_source
+-- from infra_source join v_Infra_Commune_Operateur_Type on infra_source.id_infra=v_Infra_Commune_Operateur_Type.id_infra 
+-- join source_energie on source_energie.id=infra_source.id_source;
 
-create or replace view v_Infra_Source_CD as select operateur,type,commune,district,region,proprietaire,mutualise,nb,source from v_Infra_Source;
+-- create or replace view v_Infra_Source_CD as select operateur,type,commune,district,region,proprietaire,mutualise,nb,source from v_Infra_Source;
 
 -- create or replace view v_Source_Infra as SELECT v_Operateur_geographique_Region_Type_Source.source,
 -- v_Operateur_geographique_Region_Type_Source.type,v_Operateur_geographique_Region_Type_Source.district,
@@ -304,7 +304,8 @@ create or replace view v_Infra_Source_CD as select operateur,type,commune,distri
 -- Chart Infra par operateur
 create or replace view v_Op_Infra as select Liste_Operateur.id,count(*) as nb from infra join Liste_Operateur on infra.id_operateur=Liste_Operateur.id group by infra.id_operateur; 
 
-create or replace view v_Stats_InfraByOperateur as select Liste_Operateur.couleur,Liste_Operateur.operateur,COALESCE(v_Op_Infra.nb,0) as nb from Liste_Operateur left join v_Op_Infra on 
+create or replace view v_Stats_InfraByOperateur as select Liste_Operateur.couleur,Liste_Operateur.operateur,COALESCE(v_Op_Infra.nb,0) as nb from 
+Liste_Operateur left join v_Op_Infra on 
 Liste_Operateur.id=v_Op_Infra.id;
 
 -- Chart technologie par operateur

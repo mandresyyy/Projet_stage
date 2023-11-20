@@ -136,12 +136,7 @@ class Infra extends Model
     
                 $geojson["features"][]=$feature;
         }
-        // $tempsFin = microtime(true);
-        // dd($tempsFin - $tempsDebut);
                 $geojson=json_encode($geojson);
-
-                //  $filename=public_path('geojson') . "/testa.geojson";
-                // file_put_contents($filename,$geojson);
               
                 $tab[0]=$resultats;
                   $tab[1]= $geojson;

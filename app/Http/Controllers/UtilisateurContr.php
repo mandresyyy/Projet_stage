@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Logs;
 use App\Models\Type_action;
+use App\Mail\Sender_Mail;
+use Illuminate\Support\Facades\Mail;
 
 class UtilisateurContr extends Controller
 {
@@ -48,10 +50,10 @@ class UtilisateurContr extends Controller
 
     public function create_user(Request $request){
         if(auth()->check()){
-            if($request->input('mdp')==$request->input('mdpc')){
+           
                 $utilisateur=new Utilisateur();
                 $utilisateur->email=$request->input('mail');
-                $utilisateur->motdepasse=$request->input('mdpc');
+                $utilisateur->motdepasse=$utilisateur->generate();
                 $utilisateur->matricule=$request->input('matricule');
                 $utilisateur->nom=$request->input('nom');
                 $utilisateur->prenom=$request->input('prenom');
@@ -60,6 +62,14 @@ class UtilisateurContr extends Controller
                 $boolean=$utilisateur->SInscrire();
 
                 if($boolean){
+                    $sujet="Confirmation de votre compte";
+                    $view="Mail.confirmation";
+        
+                    $data = ['code' => $utilisateur->motdepasse];
+                    $mail=new Sender_Mail($sujet,$view,15);
+                    $mail->with($data);
+        
+                    Mail::to($utilisateur->email)->send($mail);
                     $action = new Logs();
                     $action->id_utilisateur = auth()->user()->id;
                     $idtypeaction = Type_action::where('action', '=', 'insertion')->pluck('id')->first();
@@ -72,11 +82,8 @@ class UtilisateurContr extends Controller
                     $erreur="Cet Adresse mail a déjà un compte";
                     return back()->withErrors(['erreur_inscri' => $erreur])->withInput();
                 }
-            }
-            else{
-                $erreur="Mot de passe non identique";
-                return back()->withErrors(['erreur_inscri' => $erreur])->withInput();
-            }
+            
+            
             return view ('Admin/new_user',compact('utilisateur','type_user'));
         }
         else{

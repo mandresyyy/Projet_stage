@@ -9,6 +9,8 @@
 </li>
 @endsection
 @section('contenu')
+<script src="{{asset('Utilitaire/sweetalert.min.js')}}"></script>
+
 <script src="{{asset('js/infra_js.js')}}"></script>
 <div class="row">
     <div class="col-md-12">
@@ -367,6 +369,11 @@
                                     <a href="#" class="btn btn-outline green button-next"> Continue
                                         <i class="fa fa-angle-right"></i>
                                     </a>
+                                    <style>
+                                        .button-submit{
+                                            display: none;
+                                        }
+                                    </style>
                                     <a href="#" class="btn green button-submit" disabled> Submit
                                         <i class="fa fa-check"></i>
                                     </a>
@@ -388,10 +395,15 @@
                 @endif
                 @endif
                 @if(session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-                @endif
+    <script>
+        Swal.fire({
+            title: 'Succès!',
+            text: "{{ session('success') }}",
+            icon: 'success',
+            confirmButtonText: 'OK'
+        });
+    </script>
+@endif
         </div>
     </div>
 </div>

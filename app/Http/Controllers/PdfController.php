@@ -14,7 +14,8 @@ class PdfController extends Controller
     //    dd($htm);
        $request->session()->forget('cle');
        $css_path=public_path().'/css/pdf.css';
-       $style='<link rel="stylesheet" href="'.$css_path.'"><body>';
+       $logo_path=public_path().'/login/logo_artec_complet.png';
+       $style='<link rel="stylesheet" href="'.$css_path.'"><body><center><img src="'.$logo_path.'" class="logo"></center><br/>';
        $html=$style.$htm.'</body>';
         $pdf = PDF::loadHTML("$html");
 

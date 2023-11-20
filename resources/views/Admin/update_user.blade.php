@@ -9,6 +9,7 @@
 </li>
 @endsection
 @section('contenu')
+<script src="{{asset('Utilitaire/sweetalert.min.js')}}"></script>
 <div class="portlet light bordered">
     <div class="portlet-title">
         <div class="caption">
@@ -93,10 +94,15 @@
                 </div>
                 @endif
                 @if(session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-                @endif
+                            <script>
+                                Swal.fire({
+                                    title: 'Succès!',
+                                    text: "{{ session('success') }}",
+                                    icon: 'success',
+                                    confirmButtonText: 'OK'
+                                });
+                            </script>
+                            @endif
             </div>
             <div class="form-actions">
                 <div class="row">

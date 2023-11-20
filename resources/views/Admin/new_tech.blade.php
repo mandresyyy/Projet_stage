@@ -9,6 +9,8 @@
 </li>
 @endsection
 @section('contenu')
+<script src="{{asset('Utilitaire/sweetalert.min.js')}}"></script>
+
 <div class="portlet light bordered">
     <div class="portlet-title">
         <div class="caption">
@@ -29,22 +31,27 @@
                         <input type="text" class="form-control" name="techno" placeholder="Technologie" value="{{ old('techno') }}" required>
                     </div>
                 </div>
-               
+
                 @if($errors->any())
-                    @if(!$errors->has('erreur'))
+                @if(!$errors->has('erreur'))
                 <div class="alert alert-danger">
                     <ul>
                         @foreach($errors->all() as $error)
                         <li>{{ $error }}</li>
                         @endforeach
                     </ul>
-                </div>  
+                </div>
                 @endif
                 @endif
                 @if(session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
+                <script>
+                    Swal.fire({
+                        title: 'Succès!',
+                        text: "{{ session('success') }}",
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    });
+                </script>
                 @endif
             </div>
             <div class="form-actions">

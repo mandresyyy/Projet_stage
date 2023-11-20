@@ -10,22 +10,22 @@
 @endsection
 @section('contenu')
 <link href="{{asset('login/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.css')}}" rel="stylesheet" type="text/css" />
-
+<script src="{{asset('Utilitaire/sweetalert.min.js')}}"></script>
 <div class="row">
     <div class="col-md-12">
         <!-- BEGIN PORTLET-->
         <div class="portlet light form-fit bordered">
             <div class="portlet-title">
                 <div class="caption">
-                <i class="fa fa-upload font-dark"></i>
-                    <span class="caption-subject font-green sbold uppercase">Import csv</span>
+
+                    <span class="caption-subject font-green sbold uppercase">Injection infrastructures</span>
                 </div>
 
             </div>
             <div class="portlet-body form">
                 <!-- BEGIN FORM-->
                 <form action=" {{route('upload')}}" class="form-horizontal form-bordered" id="form" method="POST" enctype="multipart/form-data">
-                    @csrf                    
+                    @csrf
                     <div class="form-body">
                         <div class="form-group">
                             <label class="control-label col-md-3"></label>
@@ -44,21 +44,21 @@
                             </div>
                         </div>
                         <div class="form-group">
-                        <label class="control-label col-md-3">Operateur :</label>
-                        <div class="col-md-3">
-                            <select class="form-control uneditable-input input-fixed input-medium" name="operateur">
-                                @foreach($operateur as $op)
+                            <label class="control-label col-md-3">Operateur :</label>
+                            <div class="col-md-3">
+                                <select class="form-control uneditable-input input-fixed input-medium" name="operateur">
+                                    @foreach($operateur as $op)
                                     <option value='{{$op->id}}'>{{$op->operateur}}</option>
-                                @endforeach
-                            </select>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
-                    </div>
                         <div class="form-group">
                             <label class="control-label col-md-3">Type d'action : </label>
                             <div class="col-md-3">
-                                <div >
+                                <div>
                                     <div class="input-group input-large">
-                                        <input name="action" type="checkbox" class="make-switch" checked data-on-text="Ajout" data-on-color="success" data-off-color="warning" data-off-text="Mise à jour" data-size="small">
+                                        <input name="action" type="checkbox" class="make-switch" checked data-on-text="Ajout" data-on-color="success" data-off-color="warning" data-off-text="Intégrale" data-size="small">
                                     </div>
                                 </div>
                             </div>
@@ -74,7 +74,7 @@
                                     <i class="fa fa-download"></i> Avoir le modele CSV</a>
                                 <a href="#" id="import" class="btn green">
                                     <i class="fa fa-upload"></i> Importer CSV</a>
-                                
+
                             </div>
                         </div>
                     </div>
@@ -82,21 +82,26 @@
 
             </div>
             @if($errors->any())
-       
-        <div class="alert alert-danger">
-            <ul>
-                @foreach($errors->all() as $error)
-                <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
 
-        @endif
-        @if(session('upload'))
-        <div class="alert alert-success">
-            {{ session('upload') }}
-        </div>
-        @endif
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+
+            @endif
+            @if(session('success'))
+            <script>
+                Swal.fire({
+                    title: 'Succès!',
+                    text: "{{ session('success') }}",
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+            </script>
+            @endif
         </div>
         <!-- END PORTLET-->
     </div>
@@ -112,10 +117,10 @@
             filenameSpan.textContent = '';
         }
     });
-    var btn_import=document.getElementById('import');
-    var form=document.getElementById('form');
+    var btn_import = document.getElementById('import');
+    var form = document.getElementById('form');
 
-    btn_import.addEventListener('click', function(){
+    btn_import.addEventListener('click', function() {
         form.submit();
     });
 </script>

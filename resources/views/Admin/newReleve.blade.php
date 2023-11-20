@@ -10,14 +10,14 @@
 @endsection
 @section('contenu')
 <link href="{{asset('login/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.css')}}" rel="stylesheet" type="text/css" />
-
+<script src="{{asset('Utilitaire/sweetalert.min.js')}}"></script>
 <div class="row">
     <div class="col-md-12">
         <!-- BEGIN PORTLET-->
         <div class="portlet light form-fit bordered">
             <div class="portlet-title">
                 <div class="caption">
-                    <i class="fa fa-upload font-dark"></i>
+
                     <span class="caption-subject font-green sbold uppercase">Import fichier de rélevé</span>
                 </div>
 
@@ -43,45 +43,45 @@
                                 </div>
                             </div>
                         </div>
-                   
-                    <div class="form-group">
-                        <label class="control-label col-md-3">Operateur :</label>
-                        <div class="col-md-3">
-                            <select class="form-control uneditable-input input-fixed input-medium" name="operateur">
-                                @foreach($operateur as $op)
-                                    <option value='{{$op->id}}'>{{$op->operateur}}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label col-md-3">Description :</label>
-                        <div class="col-md-3">
-                            <input type="text" name="description" class="form-control uneditable-input input-fixed input-medium">
 
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Operateur :</label>
+                            <div class="col-md-3">
+                                <select class="form-control uneditable-input input-fixed input-medium" name="operateur">
+                                    @foreach($operateur as $op)
+                                    <option value='{{$op->id}}'>{{$op->operateur}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
-                    </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3">Description :</label>
+                            <div class="col-md-3">
+                                <input type="text" name="description" class="form-control uneditable-input input-fixed input-medium">
+
+                            </div>
+                        </div>
                     </div>
             </div>
 
 
             <div class="form-actions" style="height:50px;margin-top:15px">
-            <div class="row">
-                <div class="col-md-offset-3 col-md-9">
-                    <button class="btn green" type="submit">
-                        <i class="fa fa-upload"></i> Importer fichier</button>
+                <div class="row">
+                    <div class="col-md-offset-3 col-md-9">
+                        <button class="btn green" type="submit">
+                            <i class="fa fa-upload"></i> Importer fichier</button>
 
+                    </div>
                 </div>
             </div>
-        </div>
-        </form>
+            </form>
 
         </div>
 
-       
+
 
     </div>
-   
+
 </div>
 @if($errors->any())
 
@@ -95,9 +95,14 @@
 
 @endif
 @if(session('success'))
-<div class="alert alert-success">
-    {{ session('success') }}
-</div>
+<script>
+    Swal.fire({
+        title: 'Succès!',
+        text: "{{ session('success') }}",
+        icon: 'success',
+        confirmButtonText: 'OK'
+    });
+</script>
 @endif
 <!-- END PORTLET-->
 </div>

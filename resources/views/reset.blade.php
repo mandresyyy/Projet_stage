@@ -46,6 +46,7 @@ License: You must have a valid license purchased only from themeforest(the above
         <!-- END PAGE LEVEL STYLES -->
         <!-- BEGIN THEME LAYOUT STYLES -->
         <!-- END THEME LAYOUT STYLES -->
+        <script src="{{asset('Utilitaire/sweetalert.min.js')}}"></script>
         <link rel="shortcut icon" href="favicon.ico" /> </head>
     <!-- END HEAD -->
 
@@ -89,12 +90,21 @@ License: You must have a valid license purchased only from themeforest(the above
 
                 @if(session('success'))
     <script>
-        // Utilisez JavaScript pour afficher l'alerte dans le navigateur
-        let successMessage = "{{ session('success') }}";
-        alert(successMessage);
-        window.location.href="/";
+        // Utilisez SweetAlert à la place de l'alerte standard
+        Swal.fire({
+            title: 'Succès!',
+            text: "{{ session('success') }}",
+            icon: 'success',
+            confirmButtonText: 'OK'
+        }).then((result) => {
+            // Redirigez l'utilisateur après avoir cliqué sur OK
+            if (result.isConfirmed || result.dismiss === Swal.DismissReason.timer) {
+                window.location.href = "/";
+            }
+        });
     </script>
 @endif
+
                 </div>
                 </form>
             

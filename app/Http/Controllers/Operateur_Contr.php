@@ -107,7 +107,7 @@ class Operateur_Contr extends Controller
             $op->couleur = $request->input('couleur');
             // upload photo
             if($op->check2()){
-                if($request->input('photo')!=null){
+                if($request->file('photo')!=null){
                     $request->validate([
                         'photo' => 'required|image|max:2048',
                     ]);
@@ -120,6 +120,7 @@ class Operateur_Contr extends Controller
 
                 $op->logo=$fileName;
                 }
+                // dd($op->logo);
 
                 $op->save();
                 $action=new Logs();

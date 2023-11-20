@@ -123,7 +123,7 @@ class Contr_releve_signal extends Controller
                 "domaine"=>'releve',
                 "etat"=>'1'
             ]);
-            return redirect()->route('admin.releve.liste');
+            return back()->with('success','Relevé supprimé');
         }
         else{
             return redirect()->route('login');

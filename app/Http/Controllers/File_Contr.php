@@ -176,7 +176,7 @@ class File_Contr extends Controller
                             $premier = false;
                             if (!$this->check_first($data)) {
                                 DB::rollBack();
-                                return back()->withErrors(['erreur' => 'Le modele de fichier est invalide']);
+                                return back()->withErrors(['erreur' => 'Le modele de fichier est invalide'])->withInput();
                             }
                         } else {
                             // dd($data);
@@ -184,22 +184,22 @@ class File_Contr extends Controller
                             // dd($id_op==$operateur);
                             if ($id_op == 0) {
                                 DB::rollBack();
-                                return back()->withErrors(['erreur' => 'L\operateur n\'existe pas a la ligne' . $index]);
+                                return back()->withErrors(['erreur' => 'L\operateur n\'existe pas a la ligne' . $index])->withInput();
                             }
                             if($id_op!=$operateur){
                                 DB::rollBack();
-                                return back()->withErrors(['erreur' => 'L\'operateur n\'est pas identique à celle que vous avez mentionné à la ligne : ' . $index]);
+                                return back()->withErrors(['erreur' => 'L\'operateur n\'est pas identique à celle que vous avez mentionné à la ligne : ' . $index])->withInput();
                             }
                             if($data[5]==''){$data[5]='Non defini';}
                             $liste_tec = $this->get_techno($data[5]);
                             if (count($liste_tec) == 0) {
                                 DB::rollBack();
-                                return back()->withErrors(['erreur' => 'Technologie non existant a la ligne' . $index]);
+                                return back()->withErrors(['erreur' => 'Technologie non existant a la ligne' . $index])->withInput();
                             }
                             $type_site = $this->get_type_site($data[6]);
                             if($type_site==0){
                                 DB::rollBack();
-                                return back()->withErrors(['erreur' => 'Type de site non reconnu ' . $index.':'.$data[6]]);
+                                return back()->withErrors(['erreur' => 'Type de site non reconnu a la ligne' . $index.':'.$data[6]])->withInput();
                        
                             }
                             $liste_source = $this->source_energie($data[7]);
@@ -213,14 +213,14 @@ class File_Contr extends Controller
                                 }
                             }
                             $proprio = $this->get_proprio($data[8]);
-                            $commune = $this->get_commune($data[15]);
+                            $commune = $this->get_commune($data[16]);
                             if ($commune == 0) {
                                 // DB::rollBack();
                                 // return back()->withErrors(['erreur' => 'Veuillez verifier le code commune a la ligne' . $index]);
                                 continue;
                             }
                             for ($x = 0; $x < count($data); $x++) {
-                                if ($x == 4 || $x == 16) {
+                                if ($x == 4 || $x == 17) {
                                     if ($data[$x] == '') {
                                         $data[$x] = 'Non defini';
                                     }

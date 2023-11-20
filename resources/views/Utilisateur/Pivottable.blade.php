@@ -29,10 +29,10 @@
                     <span class="caption-helper"> ...</span>
                 </div>
                 <div class="actions">
-                    <a class="btn btn-circle btn-icon-only btn-default" href="#" id="download">
-                        <i class="fa fa-download"></i>
+                <a class=" btn-default" href="#" id="download">
+                        PDF <i class="fa fa-download"></i>
                     </a>
-                    <a class="btn btn-circle btn-icon-only btn-default fullscreen" href="#"> </a>
+                    <!-- <a class="btn btn-circle btn-icon-only btn-default fullscreen" href="#"> </a> -->
                 </div>
             </div>
             <div class="pivotTable" id="pivotTable" style="height: 100%; overflow: auto;max-height:800px"></div>

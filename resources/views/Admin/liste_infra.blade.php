@@ -14,7 +14,8 @@
 <!-- <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script> -->
 <script src="{{asset('Utilitaire/Data_table.min.js')}}"></script>
 <link href="{{asset('Utilitaire/datatable.min.css')}}" rel="stylesheet" type="text/css" />
-
+<!-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
+<script src="{{asset('Utilitaire/sweetalert.min.js')}}"></script>
 <!-- <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css" /> -->
 <link href="{{asset('login/assets/global/plugins/datatables/datatables.min.css')}}" rel="stylesheet" type="text/css" />
 <link href="{{asset('login/assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css')}}" rel="stylesheet" type="text/css" />
@@ -56,6 +57,17 @@
 
                 </div>
             </div>
+            <div style="overflow: auto;">
+            @if(session('delete'))
+            <script>
+                Swal.fire({
+                    title: 'Succès!',
+                    text: 'Infrastructure supprimée',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+            </script>
+            @endif
             <table class="table table-striped table-bordered table-hover table-checkable order-column" id="sample_1">
                 <thead>
                     <tr>
@@ -63,13 +75,13 @@
                         <th></th>
                         <th> Nom site </th>
                         <th>Operateur </th>
-                        <th> Technologie </th>
+                        <th> Technologies </th>
                         <th> Type de site </th>
                         <th> Proprietaire </th>
                         <th>Commune</th>
                         <th>Enregistrement</th>
                         <th>Status</th>
-                        <th>Supprimer</th>
+                        <th></th>
 
                     </tr>
                 </thead>
@@ -81,10 +93,14 @@
                             url = url.replace('blanc', id);
                             window.location.href = url;
                         }
-                        function delet(id){
-                            var url = "{{ route('infra.delete', ['id' => 'blanc']) }}";
-                            url = url.replace('blanc', id);
-                            window.location.href = url;
+
+                        function delet(id) {
+                           
+                                var url = "{{ route('infra.delete', ['id' => 'blanc']) }}";
+                                url = url.replace('blanc', id);
+                                window.location.href = url;
+                            
+
                         }
                     </script>
 
@@ -111,25 +127,42 @@
                         <td onclick="info(@json($inf->id))"> <span class="label label-sm label-warning">Hors service</span> </td>
                         @endif
                         <td>
-                            <button class="btn btn-circle btn-icon-only btn-default" onclick="delet(@json($inf->id))">
+                            <a class="btn btn-icon-only" onclick="confirmDelete(@json($inf->id),'{{$inf->nom_site}}','{{$inf->operateur->operateur}}')">
                                 <i class="icon-trash"></i>
-                            </button>
+                    </a>
                         </td>
-                       
+
                     </tr>
                     @endforeach
 
                 </tbody>
             </table>
-                @if(session('delete'))
-                        <script>
-                            alert('Infra supprimer');
-                        </script>
-                @endif
+            </div>
         </div>
     </div>
 </div>
 @endsection
+<script>
+    function confirmDelete(id,infra,op) {
+        
+        Swal.fire({
+            title: "Êtes-vous sûr de vouloir supprimer "+infra +"("+op +") ?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Oui, supprimer!',
+            cancelButtonText: 'Annuler'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                delet(id);
+                return true;
+            } else {
+                return false;
+            }
+        });
+    }
+</script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -142,5 +175,3 @@
 
     });
 </script>
-
-

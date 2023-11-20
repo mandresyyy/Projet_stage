@@ -140,6 +140,20 @@ class Utilisateur extends Authenticatable
             return false;
         }
     }
+
+    public function generate(){
+        $code='';
+        for($i=0;$i<6;$i++){
+            $type=mt_rand(0,1);
+            if($type==0){
+                $code=$code.mt_rand(0,9);
+            }
+           else{ 
+            $code=$code.chr(rand(65, 90));
+           }
+        }
+        return $code;
+    }
     
     
 }

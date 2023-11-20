@@ -9,6 +9,7 @@
 </li>
 @endsection
 @section('contenu')
+<script src="{{asset('Utilitaire/sweetalert.min.js')}}"></script>
 <div class="portlet light bordered">
     <div class="portlet-title">
         <div class="caption">
@@ -52,24 +53,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label class="col-md-3 control-label">Mot de passe</label>
-                    <div class="col-md-4">
-                        <div class="input-group">
-                            <input type="password" class="form-control" placeholder="Mot de passe" name="mdp" required>
-                            <span class="input-group-addon">
-                                <i class="fa fa-user"></i>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="col-md-3 control-label">Confirmation</label>
-                    <div class="col-md-4">
-                        <input type="password" class="form-control spinner" placeholder="Confirmation de mot de passe" name="mdpc" required>
-                    </div>
-                </div>
                 <div class="form-group last">
                     <label class="col-md-3 control-label">Role</label>
                     <div class="col-md-4">
@@ -89,10 +72,15 @@
                 </div>
                 @endif
                 @if(session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-                @endif
+    <script>
+        Swal.fire({
+            title: 'Succès!',
+            text: "{{ session('success') }}",
+            icon: 'success',
+            confirmButtonText: 'OK'
+        });
+    </script>
+@endif
             </div>
             <div class="form-actions">
                 <div class="row">

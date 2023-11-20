@@ -33,6 +33,7 @@
 <link href="{{asset('Utilitaire/datatable.min.css')}}" rel="stylesheet" type="text/css" />
 <link href="{{asset('login/assets/global/plugins/datatables/datatables.min.css')}}" rel="stylesheet" type="text/css" />
 <link href="{{asset('login/assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css')}}" rel="stylesheet" type="text/css" />
+<link href="{{asset('css/spinner_button.css')}}" rel="stylesheet" type="text/css" />
 
 <style>
     .custom-label-icon {
@@ -53,6 +54,7 @@
         font-size: 11px;
         /* Taille de la police */
     }
+   
     
 </style>
 
@@ -184,6 +186,13 @@
 
     </div>
 </div>
+<div class="col-md-12" style="height: 50px;">
+    <center> <button type="button" class="btn btn-success mt-ladda-btn ladda-button" id="spinButton" onclick="startSpinner()">
+                                                    <span class="ladda-label">
+                                                        <i class="icon-magnifier"></i> Rechercher</span>
+                                                </button></center>
+                                                <div id="spinner" class="hidden"></div>
+</div>
 <div class="col-md-12">
 
     <!-- BEGIN WORLD PORTLET-->
@@ -294,6 +303,9 @@
             url: '../../pivottable/fr-FR.json',
         },
     });
+
+   
+
     // } );
 </script>
 

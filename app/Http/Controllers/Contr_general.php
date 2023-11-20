@@ -102,6 +102,8 @@ class Contr_general extends Controller
     }
 
     public function loadData(Request $request){
+        // $tempsDebut = microtime(true);
+
         $user=auth()->user();
         $operateur=$request->input('operateur');
         $region=$request->input('region');
@@ -125,10 +127,10 @@ class Contr_general extends Controller
             $source=[];
         }
         
-
         $infr=new Infra();
         $resultat=$infr->to_geoSon($operateur,$region,$techno,$type,$source,$mutualise,$user);
-        $request->session()->put('liste_search', $resultat); 
+      
+        // $request->session()->put('liste_search', $resultat); 
         
         $action = new Logs();
         $action->id_utilisateur = auth()->user()->id;
@@ -136,6 +138,8 @@ class Contr_general extends Controller
         $action->id_type_action = $idtypeaction;
         $action->detail = 'Recherche sur la carte ';
         $action->newLogs();
+        // $tempsFin = microtime(true);
+        // dd($tempsFin - $tempsDebut);
         // dd($resultat);
         return $resultat;
     }

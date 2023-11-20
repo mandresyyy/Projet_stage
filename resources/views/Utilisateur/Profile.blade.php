@@ -1,9 +1,6 @@
 @extends("Utilisateur.Layouts.master")
 @section('contenu')
-
-
-
-
+<script src="{{asset('Utilitaire/sweetalert.min.js')}}"></script>
 <div class="profile-content">
     <div class="row">
         <div class="col-md-12">
@@ -73,11 +70,7 @@
                             @endif
 
 
-                            @if(session('success'))
-                            <div class="alert alert-success">
-                                {{ session('success') }}
-                            </div>
-                            @endif
+                           
                         </div>
                         <!-- END PERSONAL INFO TAB -->
 
@@ -122,9 +115,14 @@
 
 
                             @if(session('success'))
-                            <div class="alert alert-success">
-                                {{ session('success') }}
-                            </div>
+                            <script>
+                                Swal.fire({
+                                    title: 'Succès!',
+                                    text: "{{ session('success') }}",
+                                    icon: 'success',
+                                    confirmButtonText: 'OK'
+                                });
+                            </script>
                             @endif
                         </div>
                         <!-- END CHANGE PASSWORD TAB -->

@@ -78,9 +78,10 @@
                     .catch(error => {
                         console.error("Erreur : " + error);
                     });
-
+                    submit.style.display = "inline-block";
                     submit.removeAttribute("disabled");
                     nextButton.setAttribute("disabled", "true");
+                    nextButton.style.display="none";
             }
         });
         

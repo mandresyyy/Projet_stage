@@ -241,6 +241,11 @@ class Infra_Contr extends Controller
                 return back()->withErrors(['Erreur_commune'=>'Commune non existant.'])->withInput();
 
             }
+            if($infra->mutualise=='NON' && $infra->coloc!=''){
+                
+                return back()->withErrors(['Erreur'=>'Presence de colocataire dans une infrastructure non mutualise.'])->withInput();
+    
+            }
         $listesrc=session('source');
         $listetech=session('techno');
         $proprio=session('proprio');
@@ -248,14 +253,11 @@ class Infra_Contr extends Controller
         $infra->id_proprietaire=$proprio->getId();    
 
         // dd($listetech);
+       
         $infra->save();
 
         $id=$infra->id;
-        if($infra->mutualise=='NON' && $infra->coloc!=''){
-            DB::rollBack();
-            return back()->withErrors(['Erreur'=>'Presence de colocataire dans une infrastructure non mutualise.'])->withInput();
-
-        }
+      
       
         // insert infra source
         foreach($listesrc as $s){
@@ -548,6 +550,13 @@ class Infra_Contr extends Controller
 
     public function delete($id){
         if (auth()->check()) {
+            $action=new Logs();
+            $action->id_utilisateur=auth()->user()->id;
+            $infra=Infra::find($id);
+            $idtypeaction=Type_action::where('action','=','suppression')->pluck('id')->first();
+            $action->id_type_action=$idtypeaction;
+            $action->detail='Suppression infra '.$infra->nom_site.'('.$infra->code_site.')';
+            $action->newLogs();
             Infra::destroy($id);
             return back()->with('delete','Infra supprimer');      
     }

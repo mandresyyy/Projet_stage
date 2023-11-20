@@ -45,6 +45,7 @@ License: You must have a valid license purchased only from themeforest(the above
     <!-- BEGIN PAGE LEVEL STYLES -->
     <link href="{{asset('login/assets/pages/css/login.min.css')}}" rel="stylesheet" type="text/css" />
     <!-- END PAGE LEVEL STYLES -->
+    <script src="{{asset('Utilitaire/sweetalert.min.js')}}"></script>
     <!-- BEGIN THEME LAYOUT STYLES -->
     <!-- END THEME LAYOUT STYLES -->
     <link rel="shortcut icon" href="favicon.ico" />
@@ -91,6 +92,11 @@ License: You must have a valid license purchased only from themeforest(the above
         </form>
         <!-- END LOGIN FORM -->
         <!-- BEGIN FORGOT PASSWORD FORM -->
+        <style>
+            #load_spin{
+                display: none;
+            }
+        </style>
         <div class="forget-form">
             <h3 class="form-title font-green">Mot de passe oublié</h3>
 
@@ -102,7 +108,7 @@ License: You must have a valid license purchased only from themeforest(the above
 
                 <div class="form-actions">
                     <button type="button" id="back-btn" class="btn green btn-outline">Retour</i></button>
-                    <button id="send_email" class="btn btn-success uppercase pull-right " onclick="show_form_code()">Envoyer</button>
+                    <button id="send_email" class="btn btn-success uppercase pull-right " onclick="show_form_code()">Envoyer <i class="fa fa-spinner fa-spin" id="load_spin"></i> </button>
                 </div>
             </div>
             <div class="insert_code" style="display:none" id="insert_code">
@@ -113,7 +119,7 @@ License: You must have a valid license purchased only from themeforest(the above
                 </div>
                 <div class="form-actions">
                     <button type="button" id="retour" class="btn green btn-outline" onclick="to_mail_form()">Retour</i></button>
-                    <button  id="register-submit-btn" class="btn btn-success uppercase pull-right" onclick="verif_code()">Verifier</button>
+                    <button id="register-submit-btn" class="btn btn-success uppercase pull-right" onclick="verif_code()">Verifier</button>
                 </div>
                 <a onclick="show_form_code()">Réenvoyer le mail</a>
             </div>
@@ -123,37 +129,53 @@ License: You must have a valid license purchased only from themeforest(the above
             var send_mail = document.getElementById("send_mail");
             var code_form = document.getElementById('insert_code');
             var retour = document.getElementById('retour');
-            var mail=document.getElementById('mail_input');
-            var code=document.getElementById('code');
+            var mail = document.getElementById('mail_input');
+            var code = document.getElementById('code');
+            var spin=document.getElementById('load_spin');
             function show_form_code() {
+                spin.style.display="inline-block";
                 // console.log(mail.value);
-                fetch('/send/recuperation/'+mail.value, {
-                method: 'get', 
-            })
-            .then(function(response) {
-                if (response.ok) {
-                   
-                    return response.json(); 
-                } else {
-                    // Gérer les erreurs de la requête
-                    throw new Error('Erreur lors de la requête AJAX');
-                }
-            })
-            .then(function(data) {
-              if(data.Check){
-                alert(data.Message);
-                send_mail.style.display = "none";
-                code_form.style.display = 'block';
-              }
-              else{
-                alert(data.Message);
-              }
-            })
-            .catch(function(error) {
-                // Gérer les erreurs
-                console.error(error);
-            });
-               
+                fetch('/send/recuperation/' + mail.value, {
+                        method: 'get',
+                    })
+                    .then(function(response) {
+                        if (response.ok) {
+
+                            return response.json();
+                        } else {
+                            // Gérer les erreurs de la requête
+                            throw new Error('Erreur lors de la requête AJAX');
+                        }
+                    })
+                    .then(function(data) {
+                        spin.style.display='none';
+                        if (data.Check) {
+                            // Remplacez l'alerte standard par SweetAlert
+                            Swal.fire({
+                                title: 'Message',
+                                text: data.Message, // Utilisez votre variable ou propriété appropriée ici
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            });
+
+                            send_mail.style.display = "none";
+                            code_form.style.display = 'block';
+                        } else {
+                            // Remplacez l'alerte standard par SweetAlert
+                            Swal.fire({
+                                title: 'Message',
+                                text: data.Message, // Utilisez votre variable ou propriété appropriée ici
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+
+                        }
+                    })
+                    .catch(function(error) {
+                        // Gérer les erreurs
+                        console.error(error);
+                    });
+
             }
 
             function to_mail_form() {
@@ -162,31 +184,35 @@ License: You must have a valid license purchased only from themeforest(the above
             }
 
             function verif_code() {
-                fetch('/verif/code/'+code.value, {
-                method: 'get', 
-            })
-            .then(function(response) {
-                if (response.ok) {
-                   
-                    return response.json(); 
-                } else {
-                    // Gérer les erreurs de la requête
-                    throw new Error('Erreur lors de la requête AJAX');
-                }
-            })
-            .then(function(data) {
-              if(data.Check){
-                window.location.href='/reset';
-              }
-              else{
-                alert(data.Message);
-              }
-            })
-            .catch(function(error) {
-                // Gérer les erreurs
-                console.error(error);
-            });
-              
+                fetch('/verif/code/' + code.value, {
+                        method: 'get',
+                    })
+                    .then(function(response) {
+                        if (response.ok) {
+
+                            return response.json();
+                        } else {
+                            // Gérer les erreurs de la requête
+                            throw new Error('Erreur lors de la requête AJAX');
+                        }
+                    })
+                    .then(function(data) {
+                        if (data.Check) {
+                            window.location.href = '/reset';
+                        } else {
+                            Swal.fire({
+                                title: 'Message',
+                                text: data.Message, // Utilisez votre variable ou propriété appropriée ici
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    })
+                    .catch(function(error) {
+                        // Gérer les erreurs
+                        console.error(error);
+                    });
+
             }
         </script>
         <!-- END recup FORM -->

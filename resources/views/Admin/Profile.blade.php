@@ -1,5 +1,6 @@
 @extends("Admin.Layouts.master")
 @section('contenu')
+<script src="{{asset('Utilitaire/sweetalert.min.js')}}"></script>
 
 
 
@@ -17,7 +18,7 @@
                         <li class="active">
                             <a href="#tab_1_1" data-toggle="tab">Info personnel</a>
                         </li>
-                        <li >
+                        <li>
                             <a href="#tab_1_3" data-toggle="tab">Changer mot de passe</a>
                         </li>
                     </ul>
@@ -28,9 +29,9 @@
                         <div class="tab-pane active" id="tab_1_1">
                             <form role="form" action="{{route('user.profil.update')}}" method="POST">
                                 @csrf
-                            <div class="form-group">
+                                <div class="form-group">
                                     <label class="control-label">Matricule</label>
-                                    <input type="text" placeholder="" value="{{$utilisateur->matricule}}" name="" class="form-control" disabled/>
+                                    <input type="text" placeholder="" value="{{$utilisateur->matricule}}" name="" class="form-control" disabled />
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label">Nom</label>
@@ -60,7 +61,7 @@
                             </form>
                             @if($errors->any())
                             @if(!$errors->has('erreur'))
-                            
+
                             <div class="alert alert-danger">
                                 <ul>
                                     @foreach($errors->all() as $error)
@@ -68,15 +69,20 @@
                                     @endforeach
                                 </ul>
                             </div>
-                            
+
                             @endif
                             @endif
 
 
                             @if(session('success'))
-                            <div class="alert alert-success">
-                                {{ session('success') }}
-                            </div>
+                            <script>
+                                Swal.fire({
+                                    title: 'Succès!',
+                                    text: "{{ session('success') }}",
+                                    icon: 'success',
+                                    confirmButtonText: 'OK'
+                                });
+                            </script>
                             @endif
                         </div>
                         <!-- END PERSONAL INFO TAB -->
@@ -88,15 +94,15 @@
                                 @csrf
                                 <div class="form-group">
                                     <label class="control-label">Ancien mot de passe</label>
-                                    <input type="password" class="form-control" name="current_mdp" require/>
+                                    <input type="password" class="form-control" name="current_mdp" require />
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label">Nouveau mot de passe</label>
-                                    <input type="password" class="form-control" name="motdepasse" require/>
+                                    <input type="password" class="form-control" name="motdepasse" require />
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label">Retapez le nouveau mot de passe</label>
-                                    <input type="password" class="form-control" name="confirmation" require/>
+                                    <input type="password" class="form-control" name="confirmation" require />
                                 </div>
                                 <div class="margiv-top-10">
                                     <button class="btn green"> Mettre à jour </button>
@@ -105,9 +111,9 @@
                             </form>
                             @if($errors->any())
                             @if(!$errors->has('erreur'))
-                            
+
                             <script>
-                                
+
                             </script>
                             <div class="alert alert-danger">
                                 <ul>
@@ -116,15 +122,20 @@
                                     @endforeach
                                 </ul>
                             </div>
-                            
+
                             @endif
                             @endif
 
 
                             @if(session('success'))
-                            <div class="alert alert-success">
-                                {{ session('success') }}
-                            </div>
+                            <script>
+                                Swal.fire({
+                                    title: 'Succès!',
+                                    text: "{{ session('success') }}",
+                                    icon: 'success',
+                                    confirmButtonText: 'OK'
+                                });
+                            </script>
                             @endif
                         </div>
                         <!-- END CHANGE PASSWORD TAB -->

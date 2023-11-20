@@ -85,8 +85,8 @@
                     <span class="caption-helper">...</span>
                 </div>
                 <div class="actions">
-                    <a class="btn btn-circle btn-icon-only btn-default" href="{{route('admin.pivot',['type'=>1])}}">
-                        <i class="fa fa-random"></i>
+                    <a class=" btn-icon-only btn-default" href="{{route('admin.pivot',['type'=>1])}}">
+                        Tableau croisé dynamique <i class="fa fa-random"></i>
                     </a>
                 </div>
             </div>
@@ -103,8 +103,8 @@
                     <span class="caption-helper">...</span>
                 </div>
                 <div class="actions">
-                    <a class="btn btn-circle btn-icon-only btn-default" href="{{route('admin.pivot',['type'=>0])}}">
-                        <i class="fa fa-random"></i>
+                    <a class=" btn-icon-only btn-default" href="{{route('admin.pivot',['type'=>0])}}">
+                        Tableau croisé dynamique <i class="fa fa-random"></i>
                     </a>
                 </div>
             </div>
@@ -123,8 +123,8 @@
                     <span class="caption-helper">...</span>
                 </div>
                 <div class="actions">
-                <a class="btn btn-circle btn-icon-only btn-default" href="{{route('admin.pivot',['type'=>5])}}">
-                        <i class="fa fa-random"></i>
+                <a class=" btn-icon-only btn-default" href="{{route('admin.pivot',['type'=>5])}}">
+                        Tableau croisé dynamique <i class="fa fa-random"></i>
                     </a>
                 </div>
             </div>
@@ -141,8 +141,8 @@
                     <span class="caption-helper"> ...</span>
                 </div>
                 <div class="actions">
-                    <a class="btn btn-circle btn-icon-only btn-default" href="{{route('admin.pivot',['type'=>4])}}">
-                        <i class="fa fa-random"></i>
+                    <a class=" btn-icon-only btn-default" href="{{route('admin.pivot',['type'=>4])}}">
+                        Tableau croisé dynamique <i class="fa fa-random"></i>
                     </a>
                 </div>
             </div>

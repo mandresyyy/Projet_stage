@@ -22,12 +22,12 @@ class Logs extends Model
     }  
 
     public function newLogs(){
-        //  DB::table('logs')->insert(
-        //     ['id_utilisateur' => $this->id_utilisateur,
-        //     'id_type_action' => $this->id_type_action,
-        //     'detail' => $this->detail,
-        //     ],
-        // );
+         DB::table('logs')->insert(
+            ['id_utilisateur' => $this->id_utilisateur,
+            'id_type_action' => $this->id_type_action,
+            'detail' => $this->detail,
+            ],
+        );
     }
 
 }

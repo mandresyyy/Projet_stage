@@ -6,6 +6,8 @@ use App\Models\Statistique;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use App\Models\Logs;
+use App\Models\Type_action;
 
 class Contr_stats extends Controller
 {
@@ -180,7 +182,14 @@ class Contr_stats extends Controller
                 else{
                 $stats = Cache::get('infra_pv');}
             }
-            // dd($stats);
+            
+            $actionL=new Logs();
+            $actionL->id_utilisateur=$utilisateur->id;
+            $idtypeaction=Type_action::where('action','=','statistique')->pluck('id')->first();
+            $actionL->id_type_action=$idtypeaction;
+            $actionL->detail='Tableau croisé dynamique';
+            $actionL->newLogs();
+
             $page="stats";
             return view ($action,compact('page','utilisateur','stats','type'));
         }
@@ -227,6 +236,14 @@ class Contr_stats extends Controller
             $nbInfra=DB::table('nb_infra')->first();
             $nbOperateur=DB::table('nb_operateur')->first();
             $nbTechnologie=DB::table('nb_technologie')->first();
+            
+            $actionL=new Logs();
+            $actionL->id_utilisateur=$utilisateur->id;
+            $idtypeaction=Type_action::where('action','=','statistique')->pluck('id')->first();
+            $actionL->id_type_action=$idtypeaction;
+            $actionL->detail='tableau de bord';
+            $actionL->newLogs();
+
             return view ($action,compact('nbTechnologie','nbOperateur','nbInfra','page','utilisateur','stats','byTech','operateur','techno','mutualise','proprio','type'));
         }
         else{

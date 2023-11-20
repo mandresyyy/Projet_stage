@@ -4,14 +4,12 @@ exploité par l'Opérateur";Code Site;"Technologie
 (Green Field ou Rooftop)";"Source d'énergie du Site
 (JIRAMA, Solaire, Groupe électrogène, Eolienne, Mixte,…)";Propriétaire du site;"Site mutualisé
 (OUI/NON)";Si Mutualisé Opérateur en colocation;Latitude;Longitude;Hauteur de l’antenne par rapport au sol (m);"Largeur des canaux occupés
-(MHz)";CodeC;Année de mise en service
-1;GULFSAT;GULFSAT Digue (Andranoabo);T01;;3G-WiMax;;;;;;-18,88741;47,48951;;;110701;
-2;GULFSAT;Anosisoa;T02;;3G-4G-WiMax;;;;;;-18,87044;47,49257;;;111201;
-3;GULFSAT;Rova (Ambohimitsimbina);T03;;4G-WiMax;;;;;;-18,92589;47,53135;;;110801;
-4;GULFSAT;Fort Duschene;T04;;3G-4G-WiMax;;;;;;-18,91092;47,54599;;;110901;
-5;GULFSAT;Fort Voyron;T05;;3G-4G-WiMax;;;;;;-18,92962;47,52288;;;111001;
-6;GULFSAT;Ilafy Ambohibe;T06;;3G-4G-WiMax;;;;;;-18,87992;47,57555;;;110607;
-7;GULFSAT;Ambohidratrimo (Coranic);T07;;3G-4G-WiMax;;;;;;-18,81538;47,45039;;;110103;
-8;GULFSAT;Ambohidroa;T08;;3G-4G-WiMax;;;;;;-18,85396;47,48466;;;111201;
-9;GULFSAT;Talatamaty (Hôtel Medicis);T09;;3G-4G-WiMax;;;;;;-18,84078;47,46184;;;110124;
-10;GULFSAT;Mandrosoa Ivato;T0A;;3G-4G-WiMax;;;;;;-18,82114;47,46675;;;110117;
+(MHz)";Commune;CodeC;Année de mise en service
+1;GULFSAT;GULFSAT Digue (Andranoabo);T01;;3G-WiMax;;;;;;-18,88741;47,48951;;;1er Arrondissement;110701;
+2;GULFSAT;Anosisoa;T02;;3G-4G-WiMax;;;;;;-18,87044;47,49257;;;6ème Arrondissement;111201;
+3;GULFSAT;Rova (Ambohimitsimbina);T03;;4G-WiMax;;;;;;-18,92589;47,53135;;;2ème Arrondissement;110801;
+4;GULFSAT;Fort Duschene;T04;;3G-4G-WiMax;;;;;;-18,91092;47,54599;;;3ème Arrondissement;110901;
+5;GULFSAT;Fort Voyron;T05;;3G-4G-WiMax;;;;;;-18,92962;47,52288;;;4ème Arrondissement;111001;
+6;GULFSAT;Ilafy Ambohibe;T06;;3G-4G-WiMax;;;;;;-18,87992;47,57555;;;Ankadikely Ilafy;110607;
+7;GULFSAT;Ambohidratrimo (Coranic);T07;;3G-4G-WiMax;;;;;;-18,81538;47,45039;;;AMBOHIDRATRIMO;110103;
+8;GULFSAT;Ambohidroa;T08;;3G-4G-WiMax;;;;;;-18,85396;47,48466;;;6ème Arrondissement;111201;

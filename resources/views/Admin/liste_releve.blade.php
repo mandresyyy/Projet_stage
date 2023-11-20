@@ -18,6 +18,7 @@
 <!-- <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css" /> -->
 <link href="{{asset('login/assets/global/plugins/datatables/datatables.min.css')}}" rel="stylesheet" type="text/css" />
 <link href="{{asset('login/assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css')}}" rel="stylesheet" type="text/css" />
+<script src="{{asset('Utilitaire/sweetalert.min.js')}}"></script>
 <div class="col-md-12">
     <!-- BEGIN EXAMPLE TABLE PORTLET-->
     <div class="portlet light bordered">
@@ -35,19 +36,29 @@
                 </div>
             </div> -->
         </div>
+        @if(session('success'))
+            <script>
+                Swal.fire({
+                    title: 'Succès!',
+                    text: "{{ session('success') }}",
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+            </script>
+            @endif
         <div class="portlet-body">
             <div class="table-toolbar">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="btn-group">
                             <a href="{{route('new.releve_signal')}}">
-                            <button id="sample_editable_1_new" class="btn sbold green" > Importer relevé
-                                <i class="fa fa-plus"></i>
-                            </button></a>
+                                <button id="sample_editable_1_new" class="btn sbold green"> Importer relevé
+                                    <i class="fa fa-plus"></i>
+                                </button></a>
                         </div>
                     </div>
                     <div class="col-md-6">
-                       
+
                     </div>
                 </div>
             </div>
@@ -62,6 +73,14 @@
                         <th></th>
                     </tr>
                 </thead>
+                <script>
+                    function delet(id) {
+
+                        var url = "{{ route('admin.releve.delete', ['id_rel' => 'blanc']) }}";
+                        url = url.replace('blanc', id);
+                        window.location.href = url;
+                    }
+                </script>
                 <tbody>
                     @foreach($liste as $releve)
                     <tr class="odd gradeX">
@@ -70,34 +89,46 @@
                         <td> {{$releve->operateur->operateur}} </td>
                         <td>{{$releve->description}}</td>
                         <td>{{$releve->get_date_releve()}}</td>
-                        <td><a class="btn btn-icon-only " href="{{route('admin.releve.delete',['id_rel'=>$releve->id_upload])}}" onclick="return confirmDelete()"><i class="icon-trash"></i></a></td>
+                        <td><a class="btn btn-icon-only " onclick="confirmDelete('{{$releve->id_upload}}')"><i class="icon-trash"></i></a></td>
                     </tr>
                     @endforeach
-                   
+
                 </tbody>
             </table>
-            
+
         </div>
     </div>
 </div>
 @endsection
 <script>
-    function confirmDelete() {
-        if (confirm("Êtes-vous sûr de vouloir supprimer cet élément ?")) {
-            return true; // Continuer avec la suppression
-        } else {
-            return false; // Annuler la suppression
-        }
+    function confirmDelete(id) {
+        // console.log('ato');
+        Swal.fire({
+            title: 'Êtes-vous sûr de vouloir supprimer cet élément ?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Oui, supprimer!',
+            cancelButtonText: 'Annuler'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                delet(id);
+                return true;
+            } else {
+                return false;
+            }
+        });
     }
 </script>
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    new DataTable('#sample_1', {
-    language: {
-        url: '../../pivottable/fr-FR.json',
-    },
-});
-   
-    
-});
+    document.addEventListener("DOMContentLoaded", function() {
+        new DataTable('#sample_1', {
+            language: {
+                url: '../../pivottable/fr-FR.json',
+            },
+        });
+
+
+    });
 </script>
