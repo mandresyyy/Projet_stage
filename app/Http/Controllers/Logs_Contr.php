@@ -14,7 +14,7 @@ class Logs_Contr extends Controller
     public function liste(){
         if(auth()->check()){
             $utilisateur=auth()->user();
-            $liste=Logs::orderBy('date','DESC')->paginate(7);
+            $liste=Logs::orderBy('date','DESC')->paginate(15);
             $action=Type_action::all();
             $page='logs';
             return view ('Admin/logs_user',compact('page','utilisateur','liste','action'));
@@ -43,40 +43,40 @@ class Logs_Contr extends Controller
             }
             if($request->input('action')!='' && $request->input('date')=='' && $idutil==0){
                 $liste=Logs::where('id_type_action','=',$request->input('action'))
-                        ->paginate(7);
+                        ->orderBy('date','DESC')->paginate(15);
             }
             else if($request->input('action')=='' && $request->input('date')!='' && $idutil==0){
                 $liste=Logs::where('date','like','%'.$request->input('date').'%')
                         
-                        ->paginate(7);
+                        ->orderBy('date','DESC')->paginate(15);
             }
             else if($request->input('action')=='' && $request->input('date')=='' && $idutil!=0){
                 $liste=Logs::where('id_utilisateur','=',$idutil)
-                        ->paginate(7);
+                        ->orderBy('date','DESC')->paginate(15);
             }
 
             else if($request->input('action')!='' && $request->input('date')!='' && $idutil==0){
                 $liste=Logs::where('id_type_action','=',$request->input('action'))
                         ->where('date','like','%'.$request->input('date').'%')
-                        ->paginate(7);
+                        ->orderBy('date','DESC')->paginate(15);
             }
             else if($request->input('action')!='' && $request->input('date')=='' && $idutil!=0){
                 $liste=Logs::where('id_type_action','=',$request->input('action'))
                         
                         ->where('id_utilisateur','=',$idutil)
-                        ->paginate(7);
+                        ->orderBy('date','DESC')->paginate(15);
             }
             else if($request->input('action')=='' && $request->input('date')!='' && $idutil!=0){
                 $liste=Logs::where('date','like','%'.$request->input('date').'%')
                         ->where('id_utilisateur','=',$idutil)
-                        ->paginate(7);
+                        ->orderBy('date','DESC')->paginate(15);
             }
            
            else if($request->input('action')!='' && $request->input('date')!='' && $idutil!=0){
                 $liste=Logs::where('id_type_action','=',$request->input('action'))
                         ->where('date','like','%'.$request->input('date').'%')
                         ->where('id_utilisateur','=',$idutil)
-                        ->paginate(7);
+                        ->orderBy('date','DESC')->paginate(15);
             }
             $page='logs';
             return view ('Admin/logs_user',compact('page','utilisateur','liste','action'));

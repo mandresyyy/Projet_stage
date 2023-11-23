@@ -178,6 +178,9 @@ class Infra_Contr extends Controller
         if($request->input('info')!=''){
             $infr->technologie_generation=$request->input('info');
         }
+        else{
+            $infr->technologie_generation='';
+        }
 
         $listesource=[];
         $source='';

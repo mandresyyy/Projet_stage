@@ -39,7 +39,7 @@
                 <div class="form-group">
                     <label class="col-md-3 control-label">Prenom</label>
                     <div class="col-md-4">
-                        <input type="text" class="form-control" name="prenom" placeholder="prenom" value="{{ old('prenom') }}">
+                        <input type="text" class="form-control" name="prenom" placeholder="prenom" value="{{ old('prenom') }}" required>
                     </div>
                 </div>
                 <div class="form-group">

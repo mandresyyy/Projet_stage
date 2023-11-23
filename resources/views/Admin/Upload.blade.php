@@ -92,11 +92,11 @@
             </div>
 
             @endif
-            @if(session('success'))
+            @if(session('upload'))
             <script>
                 Swal.fire({
                     title: 'Succès!',
-                    text: "{{ session('success') }}",
+                    text: "{{ session('upload') }}",
                     icon: 'success',
                     confirmButtonText: 'OK'
                 });

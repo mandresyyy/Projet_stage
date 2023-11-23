@@ -116,8 +116,8 @@
         if (selectedValue == 'Tableau' || selectedValue == 'Tableau de chaleur') {
             const divContent = document.getElementsByClassName("pvtTable");
             html = '<table style="width:100%" border="1">' + divContent[0].innerHTML + '</table>';
-            console.log('tab');
-            // pdf_tableau(html);
+            // console.log('tab');
+            pdf_tableau(html);
         } else {
             pdf_chart();
             // console.log('chart');
