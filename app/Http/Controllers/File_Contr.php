@@ -27,7 +27,7 @@ class File_Contr extends Controller
 
     public function check_first($data)
     {
-        if (count($data) != 17) {
+        if (count($data) != 18) {
             // dd("alava");
             return false;
         } else {
@@ -284,7 +284,7 @@ class File_Contr extends Controller
                 $action->id_utilisateur=auth()->user()->id;
                 $idtypeaction=Type_action::where('action','=','insertion')->pluck('id')->first();
                 $action->id_type_action=$idtypeaction;
-                $action->detail='Import fichier csv '.$request->file('fichier_csv');
+                $action->detail='Import fichier csv '.$file->getClientOriginalName();;
                 $action->newLogs();
                 DB::table('mise_a_jour')->where("domaine",'=','infra')->update([
                     "domaine"=>'infra',

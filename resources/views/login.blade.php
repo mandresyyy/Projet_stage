@@ -131,10 +131,10 @@ License: You must have a valid license purchased only from themeforest(the above
             var retour = document.getElementById('retour');
             var mail = document.getElementById('mail_input');
             var code = document.getElementById('code');
-            var spin=document.getElementById('load_spin');
+            
             function show_form_code() {
-                spin.style.display="inline-block";
-                // console.log(mail.value);
+                var spin=document.getElementById('load_spin');
+                spin.style.display="block";
                 fetch('/send/recuperation/' + mail.value, {
                         method: 'get',
                     })
@@ -143,17 +143,16 @@ License: You must have a valid license purchased only from themeforest(the above
 
                             return response.json();
                         } else {
-                            // Gérer les erreurs de la requête
-                            throw new Error('Erreur lors de la requête AJAX');
+                            spin.style.display='none';
+                            throw new Error('Veuillez entrer votre mail');
                         }
                     })
                     .then(function(data) {
                         spin.style.display='none';
                         if (data.Check) {
-                            // Remplacez l'alerte standard par SweetAlert
                             Swal.fire({
                                 title: 'Message',
-                                text: data.Message, // Utilisez votre variable ou propriété appropriée ici
+                                text: data.Message, 
                                 icon: 'success',
                                 confirmButtonText: 'OK'
                             });
@@ -161,10 +160,9 @@ License: You must have a valid license purchased only from themeforest(the above
                             send_mail.style.display = "none";
                             code_form.style.display = 'block';
                         } else {
-                            // Remplacez l'alerte standard par SweetAlert
                             Swal.fire({
                                 title: 'Message',
-                                text: data.Message, // Utilisez votre variable ou propriété appropriée ici
+                                text: data.Message, 
                                 icon: 'error',
                                 confirmButtonText: 'OK'
                             });
@@ -174,6 +172,12 @@ License: You must have a valid license purchased only from themeforest(the above
                     .catch(function(error) {
                         // Gérer les erreurs
                         console.error(error);
+                        Swal.fire({
+                                title: 'Erreur',
+                                text: error,
+                                icon: 'warning',
+                                confirmButtonText: 'OK'
+                            });
                     });
 
             }
@@ -202,7 +206,7 @@ License: You must have a valid license purchased only from themeforest(the above
                         } else {
                             Swal.fire({
                                 title: 'Message',
-                                text: data.Message, // Utilisez votre variable ou propriété appropriée ici
+                                text: data.Message, 
                                 icon: 'error',
                                 confirmButtonText: 'OK'
                             });
@@ -218,10 +222,7 @@ License: You must have a valid license purchased only from themeforest(the above
         <!-- END recup FORM -->
     </div>
     <div class="copyright"> 2014 © Metronic. Admin Dashboard Template. </div>
-    <!--[if lt IE 9]>
-<script src="{{asset('login/assets/global/plugins/respond.min.js')}}"></script>
-<script src="{{asset('login/assets/global/plugins/excanvas.min.js')}}"></script> 
-<![endif]-->
+    
     <!-- BEGIN CORE PLUGINS -->
     <script src="{{asset('login/assets/global/plugins/jquery.min.js')}}" type="text/javascript"></script>
     <script src="{{asset('login/assets/global/plugins/bootstrap/js/bootstrap.min.js')}}" type="text/javascript"></script>

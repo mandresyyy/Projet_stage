@@ -12,7 +12,7 @@
         }
 
         
-            var map = L.map('map').setView([-18.8792, 46.3504], 6); // initialisation de la carte
+            var map = L.map('map').setView([-18.8792, 46.3504], 8); // initialisation de la carte
             var tuile = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { // ajout tuile
                 maxZoom: 25,
                 attribution: '© OpenStreetMap'
@@ -50,7 +50,7 @@
                             }));
                         })
                         .catch(error => console.error('Erreur :', error));
-                    layerControl.addOverlay(groupop, operateur[z].operateur);
+                    layerControl.addBaseLayer(groupop, operateur[z].operateur);
     
                 }
     
@@ -77,7 +77,7 @@
                             }));
                         })
                         .catch(error => console.error('Erreur :', error));
-                    layerControl.addOverlay(grouptech, tech[z].generation);
+                    layerControl.addBaseLayer(grouptech, tech[z].generation);
     
                 }
             }
@@ -257,7 +257,7 @@
 
                     })
                     .catch(error => console.error('Erreur :', error));
-                layerControl.addOverlay(group, "Infrastructure");
+                layerControl.addOverlay(group, "Infrastructures");
 
             }
 

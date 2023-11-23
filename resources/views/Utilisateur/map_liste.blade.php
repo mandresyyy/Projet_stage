@@ -50,7 +50,7 @@
     </style>
 <div class="row">
 
-    <div class="col-md-12 " style="height: 150px; ">
+    <div class="col-md-12 " style="height: 130px; ">
         <div class="col-md-2">
            
                 <span class="caption-subject font-green-sharp bold uppercase">Operateur </span>

@@ -113,9 +113,9 @@ insert into operateur (operateur,couleur) values ('Orange','#FFA500'),
 ('Gulfsat','#ADD8E6');
 
 
-insert into technologie (generation) values ('Non defini'),('2G'),('3G'),('4G');
+insert into technologie (generation) values ('Non defini'),('2G'),('3G'),('4G'),('BLR'),('WiMax');
 
-insert into type_site (type) values ('Non defini'),('Greenfield'),('Rooftop');
+insert into type_site (type) values ('Non defini'),('Greenfield'),('Rooftop'),('Zebu'),('Indoor'),('IBs'),('Pylône'),('Water tank');
 
 insert into source_energie (source) values ('Non defini'),('Jirama'),('Eolienne'),('Groupe electrogene'),('Solaire'),('Mixte');
 
