@@ -74,7 +74,7 @@
         <div class="col-md-2">
             
 
-                <span class="caption-subject font-green-sharp bold uppercase">Operateur </span>
+                <span class="caption-subject font-green-sharp bold uppercase">Technologie </span>
 
                 <div class="portlet-body todo-project-list-content">
                     <div class="todo-project-list">

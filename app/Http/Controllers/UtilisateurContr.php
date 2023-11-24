@@ -14,6 +14,7 @@ use App\Models\Logs;
 use App\Models\Type_action;
 use App\Mail\Sender_Mail;
 use Illuminate\Support\Facades\Mail;
+use Exception;
 
 class UtilisateurContr extends Controller
 {
@@ -59,6 +60,7 @@ class UtilisateurContr extends Controller
                 $utilisateur->prenom=$request->input('prenom');
                 $utilisateur->id_type_util=$request->input('type');
                 // dd($utilisateur);
+                DB::beginTransaction();
                 $boolean=$utilisateur->SInscrire();
 
                 if($boolean){
@@ -68,14 +70,20 @@ class UtilisateurContr extends Controller
                     $data = ['code' => $utilisateur->motdepasse];
                     $mail=new Sender_Mail($sujet,$view,15);
                     $mail->with($data);
-        
-                    Mail::to($utilisateur->email)->send($mail);
+                    try{
+                        Mail::to($utilisateur->email)->send($mail);
+                    }
+                    catch(Exception $e){
+                        DB::rollBack();
+                        return back()->withErrors(['erreur_inscri' => 'Mail non envoyé'])->withInput();
+                    }
                     $action = new Logs();
                     $action->id_utilisateur = auth()->user()->id;
                     $idtypeaction = Type_action::where('action', '=', 'insertion')->pluck('id')->first();
                     $action->id_type_action = $idtypeaction;
                     $action->detail = 'Creation utilisateur :'.' '. $utilisateur->prenom.' '.$utilisateur->email.' '.$utilisateur->matricule;
                     $action->newLogs();
+                    DB::commit();
                     return back()->with(['success' => 'Utilisateur crée']);
                 }
                 else{
