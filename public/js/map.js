@@ -18,7 +18,7 @@ function startSpinner() {
     }, 3000); // Remplacez 3000 par la durée de votre opération asynchrone (en millisecondes)
 }
 
-var map = L.map('map').setView([-18.8792, 46.3504], 8); // initialisation de la carte
+var map = L.map('map').setView([-18.91783, 47.52372], 12); // initialisation de la carte
 var tuile = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { // ajout tuile
     maxZoom: 25,
     attribution: '© OpenStreetMap'
@@ -92,20 +92,21 @@ function showMarqueur(json_name) {
                     }
                     let supgauche = [lat + demi, lon - demi];
                     let supdroite = [lat - demi, lon + demi];
-                    var carre = L.rectangle([supgauche, supdroite], {
-                        color: feature.properties.couleur,
-                        fillColor: feature.properties.couleur,
-                        fillOpacity: 0.5
-                    });
+                   
                     if (feature.properties.mutualise == 'OUI') {
                         var circle = L.circle([lat, lon], {
                             color: 'purple',
                             fillColor: '##BA55D3',
-                            fillOpacity: 0,
-                            radius: 10
+                            fillOpacity: 1,
+                            radius: 35
                         });
                         group.addLayer(circle);
                     }
+                    var carre = L.rectangle([supgauche, supdroite], {
+                        color: feature.properties.couleur,
+                        fillColor: feature.properties.couleur,
+                        fillOpacity: 1
+                    });
                     return carre
                     
                 },

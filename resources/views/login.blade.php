@@ -21,7 +21,7 @@ License: You must have a valid license purchased only from themeforest(the above
 
 <head>
     <meta charset="utf-8" />
-    <title>Metronic | User Login 1</title>
+    <title>Infrastructure</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="width=device-width, initial-scale=1" name="viewport" />
     <meta content="" name="description" />
@@ -221,7 +221,7 @@ License: You must have a valid license purchased only from themeforest(the above
         </script>
         <!-- END recup FORM -->
     </div>
-    <div class="copyright"> 2014 © Metronic. Admin Dashboard Template. </div>
+    <div class="copyright"> 2023 © ARTEC. </div>
     
     <!-- BEGIN CORE PLUGINS -->
     <script src="{{asset('login/assets/global/plugins/jquery.min.js')}}" type="text/javascript"></script>
